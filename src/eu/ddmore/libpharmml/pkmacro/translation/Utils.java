@@ -4,6 +4,7 @@ import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Rhs;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
+import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Equation;
@@ -62,12 +63,25 @@ public class Utils {
 	
 	public static String variableToString(DerivativeVariable dv){
 		StringBuilder sb = new StringBuilder();
-		sb.append(dv.getSymbId()+" = ");
+		sb.append("d"+dv.getSymbId()+"/dt = ");
 		if(dv.getAssign().getEquation() != null){
 			if(dv.getAssign().getEquation().getBinop() != null){
 				sb.append(dv.getAssign().getEquation().getBinop());
 			} else if (dv.getAssign().getEquation().getUniop() != null){
 				sb.append(dv.getAssign().getEquation().getUniop());
+			}
+		}
+		return sb.toString();
+	}
+	
+	public static String variableToString(VariableDefinition v){
+		StringBuilder sb = new StringBuilder();
+		sb.append(v.getSymbId()+" = ");
+		if(v.getAssign().getEquation() != null){
+			if(v.getAssign().getEquation().getBinop() != null){
+				sb.append(v.getAssign().getEquation().getBinop());
+			} else if (v.getAssign().getEquation().getUniop() != null){
+				sb.append(v.getAssign().getEquation().getUniop());
 			}
 		}
 		return sb.toString();
