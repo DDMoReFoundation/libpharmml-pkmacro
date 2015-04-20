@@ -118,7 +118,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 			Utils.addOperand(target.getAmount(),Binoperator.PLUS, Tk0);
 			break;
 		case FIRST_ORDER:
-			Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(target.getAmount().getSymbId()));
+			Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(amount.getSymbId()));
 			Utils.addOperand(target.getAmount(),Binoperator.PLUS, binop);
 			break;
 		default: // transit
