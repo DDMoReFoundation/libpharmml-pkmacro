@@ -1,8 +1,10 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
+import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Equation;
@@ -25,7 +27,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	protected final AbstractCompartment target;
 	
 	protected final Type type;
-	protected SymbolRef inputTarget;
+	protected CommonVariableDefinition inputTarget;
 		
 	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, 
 			AbstractCompartment target, Type type, String cmt, DerivativeVariable amount, Translator tl) {
@@ -133,7 +135,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		Uniop uniop = new Uniop(Unioperator.MINUS, (ExpressionValue) Tk0);
 		eq.setUniop(uniop);
 		amount.assign(eq);
-		inputTarget = new SymbolRef(target.getAmount().getSymbId());
+		inputTarget = amount;
 	}
 	
 	protected void generateFirstOrderODE(Translator tl){
@@ -144,21 +146,23 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		uniop.setValue(binop);
 		eq.setUniop(uniop);
 		amount.assign(eq);
-		inputTarget = new SymbolRef(target.getAmount().getSymbId());
+		inputTarget = amount;
 	}
 	
 	protected void generateTransitODE(Translator tl){		
 		VariableFactory varFac = tl.getVariableFactory();
-		SymbolRef dose = varFac.createAndReferNewParameter("Dose");
-		SymbolRef t_dose = varFac.createAndReferNewParameter("t_Dose");
+		VariableDefinition dose = varFac.generateVariable("Dose");
+		SymbolRef doseRef = new SymbolRef(dose.getSymbId());
+		VariableDefinition t_dose = varFac.generateVariable("t_Dose");
+		SymbolRef t_doseRef = new SymbolRef(t_dose.getSymbId());
 		SymbolRef n = varFac.createAndReferNewParameter("n");
 		SymbolRef f = varFac.createAndReferNewParameter("F");
-		SymbolRef t = new SymbolRef("t");
+		SymbolRef t = new SymbolRef("t"); // must be defined as IndependentVariable
 		
 		// log(F*Dose)
 		Uniop logFDose = new Uniop();
 		logFDose.setOperator(Unioperator.LOG);
-		logFDose.setValue(new Binop(Binoperator.TIMES, f, dose));
+		logFDose.setValue(new Binop(Binoperator.TIMES, f, doseRef));
 		
 		// log(Ktr)
 		Uniop logKtr = new Uniop();
@@ -176,7 +180,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 						new Binop(
 								Binoperator.TIMES,
 								Ktr,
-								new Binop(Binoperator.MINUS, t, t_dose)
+								new Binop(Binoperator.MINUS, t, t_doseRef)
 								)
 				)
 				);
@@ -185,7 +189,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		Binop ktrttDose = new Binop(
 				Binoperator.TIMES, 
 				Ktr, 
-				new Binop(Binoperator.MINUS, t, t_dose));
+				new Binop(Binoperator.MINUS, t, t_doseRef));
 		
 		// - log(n!)
 		Uniop logn = new Uniop();
@@ -225,7 +229,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 
 	@Override
 	public void generateInputs(InputList inputList) throws InvalidMacroException {
-		inputList.createInput(InputType.ORAL, adm, target.getAmount());
+		inputList.createInput(InputType.ORAL, adm, inputTarget);
 	}
 	
 }

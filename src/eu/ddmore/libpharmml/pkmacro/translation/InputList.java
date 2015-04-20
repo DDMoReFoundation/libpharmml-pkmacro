@@ -2,7 +2,7 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 import java.util.ArrayList;
 
-import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 
 /**
@@ -22,7 +22,7 @@ class InputList extends ArrayList<Input> {
 	 * @param target
 	 * @return The created and added {@link Input} object.
 	 */
-	Input createInput(InputType type, Scalar adm, DerivativeVariable target){
+	Input createInput(InputType type, Scalar adm, CommonVariableDefinition target){
 		Input input = new Input(size()+1, type, adm, target);
 		add(input);
 		return input;
