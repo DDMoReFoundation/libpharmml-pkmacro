@@ -1,7 +1,9 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
+import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 
 /**
  * Class defining a PK input.
@@ -11,9 +13,9 @@ public class Input {
 	private final int number;
 	private final InputType type;
 	private final Scalar adm;
-	private final DerivativeVariable target;
+	private final CommonVariableDefinition target;
 
-	Input(int number, InputType type, Scalar adm, DerivativeVariable target) {
+	Input(int number, InputType type, Scalar adm, CommonVariableDefinition target) {
 		this.number = number;
 		this.type = type;
 		this.adm = adm;
@@ -46,9 +48,9 @@ public class Input {
 
 	/**
 	 * Gets the target variable of the input.
-	 * @return The target as a {@link DerivativeVariable}.
+	 * @return The target as a {@link VariableDefinition} or a {@link DerivativeVariable}.
 	 */
-	public DerivativeVariable getTarget() {
+	public CommonVariableDefinition getTarget() {
 		return target;
 	}
 	
