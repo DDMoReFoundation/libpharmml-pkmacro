@@ -89,7 +89,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		if(Tk0 != null){
 			type = Type.ZERO_ORDER;
 			amount = tl.getVariableFactory().generateDerivativeVariable("Ad");
-		} else if(ka != null){
+		} else if(ka != null && (Ktr == null || Mtt == null)){
 			type = Type.FIRST_ORDER;
 			amount = tl.getVariableFactory().generateDerivativeVariable("Ad");
 		} else if(Ktr != null && Mtt != null){
