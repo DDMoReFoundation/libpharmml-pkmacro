@@ -15,50 +15,59 @@ class Effect extends AbstractCompartment {
 	final protected Operand ke0;
 	final protected AbstractCompartment target;
 	
-	private VariableDefinition concentration_equation;
+//	protected VariableDefinition targetConcentration;
 	
-	private Effect(AbstractCompartment target, DerivativeVariable amount, Operand ke0, VariableDefinition concentration) throws InvalidMacroException{
-		super("toGenerate", amount, null, new SymbolRef(concentration.getSymbId()));
+	private Effect(AbstractCompartment target, Operand ke0, DerivativeVariable concentration, 
+			VariableDefinition targetConcentration){
+		super("toGenerate", null, null, new SymbolRef(concentration.getSymbId()));
 		this.ke0 = ke0;
 		this.target = target;
 		
 		// C = Ac/V
-		this.concentration_equation = concentration;
+//		this.targetConcentration = targetConcentration;
 		Equation eq = new Equation();
 		eq.setBinop(new Binop(Binoperator.DIVIDE, 
 				new SymbolRef(target.getAmount().getSymbId()), 
 				target.getVolume()));
-		concentration_equation.assign(eq);
+		targetConcentration.assign(eq);
 		
 		// dCe/dt = ke0*(C - Ce)
 		Equation eq2 = new Equation();
-		Operand targetConcentration = target.getConcentration();
-		if(targetConcentration == null){
-			throw new InvalidMacroException("Target compartment (cmt="+target.getCmt()+
-					") of Effect macro must have a defined concentration parameter.");
-		}
 		eq2.setBinop(new Binop(Binoperator.TIMES,
 				ke0,
-				new Binop(Binoperator.MINUS, targetConcentration, new SymbolRef(amount.getSymbId()))
+				new Binop(Binoperator.MINUS, new SymbolRef(targetConcentration.getSymbId()), new SymbolRef(concentration.getSymbId()))
 				));
-		amount.assign(eq2);
+		concentration.assign(eq2);
 	}
 	
 	static Effect fromMacro(Translator tl, EffectMacro macro) throws InvalidMacroException{
 		ParamResolver pr = new ParamResolver(macro);
 		
-		SymbolRef concentrationRef = pr.getValue("concentration", SymbolRef.class);
-		DerivativeVariable concentration = tl.getVariableFactory().generateDerivativeVariable(concentrationRef.getSymbIdRef());
+		SymbolRef concentrationRef = pr.getValue(EffectMacro.Arg.CONCENTRATION, SymbolRef.class);
+//		DerivativeVariable concentration = tl.getVariableFactory().generateDerivativeVariable(
+//				concentrationRef.getSymbIdRef());
+		DerivativeVariable concentration = resolveDerivativeVariable(tl, concentrationRef);
 		
 		String cmt = pr.getValue("cmt").getContent().toString();
 		AbstractCompartment target = tl.getCompartment(cmt);
 		
 		Operand ke0 = pr.getValue(EffectMacro.Arg.KE0.toString(), Operand.class);
 		
-		SymbolRef c = pr.getValue(EffectMacro.Arg.CONCENTRATION.toString(), SymbolRef.class);
-		VariableDefinition v = resolveVariable(tl, c);
+		// fetch target concentration
+		Operand targetConcentrationRef = target.getConcentration();
+		if(targetConcentrationRef == null){
+			throw new InvalidMacroException("Target compartment (cmt="+target.getCmt()+
+					") of Effect macro must have a defined concentration parameter.");
+		}
+		if(!(targetConcentrationRef instanceof SymbolRef)){
+			throw new InvalidMacroException("Concentration in compartment "+target.getCmt()+" must be a symbol reference.");
+		}
+		VariableDefinition targetConcentration = tl.getVariableFactory().fetchVariable(((SymbolRef)targetConcentrationRef).getSymbIdRef());
+		if(targetConcentration == null){
+			throw new InvalidMacroException("Symbol reference for concentration in compartment "+target.getCmt()+"is not resolved.");
+		}
 		
-		Effect effect = new Effect(target,concentration,ke0,v);
+		Effect effect = new Effect(target,ke0,concentration,targetConcentration);
 		tl.addCompartment(effect);
 		
 		return effect;
