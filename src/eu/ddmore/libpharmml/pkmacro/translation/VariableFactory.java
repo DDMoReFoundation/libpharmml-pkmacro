@@ -149,7 +149,8 @@ public class VariableFactory {
 	
 	DerivativeVariable transformToDerivativeVariable(VariableDefinition v){
 		DerivativeVariable dv = new DerivativeVariable(v.getSymbId(), v.getSymbolType());
-		variables.add(variables.lastIndexOf(v), dv);
+		variables.remove(v);
+		variables.add(dv);
 		return dv;
 	}
 	
