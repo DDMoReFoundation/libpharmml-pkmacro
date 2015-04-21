@@ -77,7 +77,7 @@ public class Utils {
 	public static String variableToString(VariableDefinition v){
 		StringBuilder sb = new StringBuilder();
 		sb.append(v.getSymbId()+" = ");
-		if(v.getAssign().getEquation() != null){
+		if(v.getAssign() != null && v.getAssign().getEquation() != null){
 			if(v.getAssign().getEquation().getBinop() != null){
 				sb.append(v.getAssign().getEquation().getBinop());
 			} else if (v.getAssign().getEquation().getUniop() != null){
