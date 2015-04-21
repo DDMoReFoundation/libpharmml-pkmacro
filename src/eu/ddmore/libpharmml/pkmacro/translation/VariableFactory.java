@@ -2,9 +2,10 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,7 @@ import eu.ddmore.libpharmml.dom.commontypes.SymbolType;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
+import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 public class VariableFactory {
 	
@@ -25,13 +27,13 @@ public class VariableFactory {
 	public static String CENTRAL_CMT_PREFIX = "Ac";
 	public static String PERIPH_CMT_PREFIX = "Ap";
 		
-	private final Map<String, AtomicInteger> variables_count;
+	private final Map<String, Set<Integer>> variables_count;
 	
 	private final List<CommonVariableDefinition> variables;
 	private final List<SimpleParameter> parameters;
 	
-	VariableFactory(StructuralModel sm){
-		variables_count = new HashMap<String, AtomicInteger>();
+	VariableFactory(StructuralModel sm) throws InvalidMacroException{
+		variables_count = new HashMap<String, Set<Integer>>();
 		variables = new ArrayList<CommonVariableDefinition>();
 		parameters = new ArrayList<SimpleParameter>();
 		
@@ -43,11 +45,53 @@ public class VariableFactory {
 		}
 	}
 	
+	boolean variableExists(String symbolId){
+		return flattenVariableNames().contains(symbolId);
+	}
+	
+	private List<String> flattenVariableNames(){
+		List<String> list = new ArrayList<String>();
+		for(String prefix : variables_count.keySet()){
+			for(Integer index : variables_count.get(prefix)){
+				list.add(prefix+index);
+			}
+		}
+		return list;
+	}
+	
+	/**
+	 * Attempt to force variable creation. If the variable name already exists, a new one will be generated.
+	 * @param prefix
+	 * @param index
+	 * @return
+	 */
+	DerivativeVariable createDerivativeVariable(String prefix, Integer index){
+		if(variableExists(prefix+index)){
+			return generateDerivativeVariable(prefix);
+		} else {
+			DerivativeVariable dv = new DerivativeVariable();
+			dv.setSymbId(prefix+index);
+			dv.setSymbolType(SymbolType.REAL);
+			try {
+				storeVariable(dv);
+			} catch (InvalidMacroException e) {
+				// Should never happen. SymbId has been checked.
+				throw new RuntimeException(e);
+			}
+			return dv;
+		}
+	}
+	
 	DerivativeVariable generateDerivativeVariable(String prefix){
 		DerivativeVariable dv = new DerivativeVariable();
 		dv.setSymbId(generateVariableName(prefix));
 		dv.setSymbolType(SymbolType.REAL);
-		variables.add(dv);
+		try {
+			storeVariable(dv);
+		} catch (InvalidMacroException e) {
+			// Should never happen. SymbId has been generated.
+			throw new RuntimeException(e);
+		}
 		return dv;
 	}
 	
@@ -55,22 +99,47 @@ public class VariableFactory {
 		VariableDefinition v = new VariableDefinition();
 		v.setSymbId(generateVariableName(prefix));
 		v.setSymbolType(SymbolType.REAL);
-		variables.add(v);
+		try {
+			storeVariable(v);
+		} catch (InvalidMacroException e) {
+			// Should never happen. SymbId has been generated.
+			throw new RuntimeException(e);
+		}
 		return v;
 	}
 	
 	SimpleParameter generateParameter(String prefix){
 		SimpleParameter p = new SimpleParameter();
 		p.setSymbId(generateVariableName(prefix));
-		parameters.add(p);
+		try {
+			storeParameter(p);
+		} catch (InvalidMacroException e) {
+			// Should never happen. SymbId has been generated.
+			throw new RuntimeException(e);
+		}
 		return p;
 	}
 
 	private String generateVariableName(String name){
-		if(!variables_count.containsKey(name)){
-			variables_count.put(name, new AtomicInteger(0));
+		return name + getFirstPossibleIndex(name);
+	}
+	
+	private Integer getFirstPossibleIndex(String prefix){
+		if(variables_count.containsKey(prefix)){
+			return getMax(variables_count.get(prefix))+1;
+		} else {
+			return 1;
 		}
-		return name + variables_count.get(name).incrementAndGet();
+	}
+	
+	private Integer getMax(Set<Integer> set){
+		Integer max = 0;
+		for(Integer value : set){
+			if(value > max){
+				max = value;
+			}
+		}
+		return max;
 	}
 	
 	SymbolRef createAndReferNewParameter(String name){
@@ -79,24 +148,26 @@ public class VariableFactory {
 		return symbRef;
 	}
 	
-	void storeVariable(CommonVariableDefinition variable){
+	void storeVariable(CommonVariableDefinition variable) throws InvalidMacroException{
 		VariableName varName = parseVariableName(variable.getSymbId());
-		if(!variables_count.containsKey(varName.getPrefix())){
-			variables_count.put(varName.getPrefix(), new AtomicInteger(0));
-		}
-		variables_count.get(varName.getPrefix()).incrementAndGet();
-		
+		storeSymbol(varName.getPrefix(), varName.getIndex());
 		variables.add(variable);
 	}
 	
-	void storeParameter(SimpleParameter p){
+	void storeParameter(SimpleParameter p) throws InvalidMacroException{
 		VariableName varName = parseVariableName(p.getSymbId());
-		if(!variables_count.containsKey(varName.getPrefix())){
-			variables_count.put(varName.getPrefix(), new AtomicInteger(0));
-		}
-		variables_count.get(varName.getPrefix()).incrementAndGet();
-		
+		storeSymbol(varName.getPrefix(), varName.getIndex());
 		parameters.add(p);
+	}
+	
+	private void storeSymbol(String prefix,Integer index) throws InvalidMacroException{
+		if(!variables_count.containsKey(prefix)){
+			variables_count.put(prefix, new HashSet<Integer>());
+		}
+		if(variables_count.get(prefix).contains(index)){
+			throw new InvalidMacroException(prefix+"["+index+"] is duplicate symbol");
+		}
+		variables_count.get(prefix).add(index);
 	}
 	
 	List<CommonVariableDefinition> getDefinedVariables(){
@@ -108,7 +179,7 @@ public class VariableFactory {
 	}
 	
 	VariableName parseVariableName(String raw){
-		Pattern p = Pattern.compile("(\\w+)(\\d*)");
+		Pattern p = Pattern.compile("([a-zA-Z]+)(\\d*)");
 		Matcher m = p.matcher(raw);
 		if(m.find()){
 			String prefix = m.group(1);

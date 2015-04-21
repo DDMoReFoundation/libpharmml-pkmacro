@@ -28,6 +28,10 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	
 	protected final Type type;
 	protected CommonVariableDefinition inputTarget;
+	
+	// Zero-order variables. Must be set if type == Type.ZERO_ORDER
+	protected VariableDefinition zeroOrderRate = null;
+	protected VariableDefinition lastDoseAmountToAd = null;
 		
 	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, 
 			AbstractCompartment target, Type type, String cmt, DerivativeVariable amount, VariableFactory vf) {
@@ -84,17 +88,19 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		AbstractCompartment target = cf.getCompartment(
 				pr.getValue(AbsorptionOralMacro.Arg.CMT).getContent().toString());
 		
+		Integer cmt = cf.compartmentsSize()+1;
+		
 		Type type = null;
 		DerivativeVariable amount;
 		if(Tk0 != null){
 			type = Type.ZERO_ORDER;
-			amount = vf.generateDerivativeVariable("Ad");
+			amount = vf.createDerivativeVariable(VariableFactory.DEPOT_PREFIX, cmt);
 		} else if(ka != null && (Ktr == null || Mtt == null)){
 			type = Type.FIRST_ORDER;
-			amount = vf.generateDerivativeVariable("Ad");
+			amount = vf.createDerivativeVariable(VariableFactory.DEPOT_PREFIX, cmt);
 		} else if(Ktr != null && Mtt != null){
 			type = Type.TRANSIT;
-			amount = vf.generateDerivativeVariable("Aa");
+			amount = vf.createDerivativeVariable(VariableFactory.ABSORPTION_PREFIX, cmt);
 		} else {
 			throw new InvalidMacroException("Absorption/Oral macro must have the following prameters: "
 					+ "Tk0, ka or [Ktr and Mtt]");
@@ -102,7 +108,8 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		
 		
 		Absorption abs = new Absorption(adm, Tlag, Tk0, ka, Ktr, Mtt, target,
-				type, String.valueOf(cf.compartmentsSize()), amount, vf);
+				type, cmt.toString(), amount, vf);
+		cf.addCompartment(abs);
 		return abs;
 	}
 	
@@ -131,6 +138,9 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	}
 	
 	protected void generateZeroOrderODE(VariableFactory varFac){
+		// Create variables
+		
+		
 		Equation eq = new Equation();
 		Uniop uniop = new Uniop(Unioperator.MINUS, (ExpressionValue) Tk0);
 		eq.setUniop(uniop);
