@@ -8,6 +8,7 @@ import java.util.Map;
 import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.AbsorptionOralMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.CompartmentMacro;
@@ -194,8 +195,12 @@ public class Translator {
 			if(var instanceof DerivativeVariable){
 				sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createDerivativeVariable(
 						(DerivativeVariable) var));
+			} else if (var instanceof VariableDefinition){
+				sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createVariable(
+						(VariableDefinition) var));
 			}
 		}
+		sm.getSimpleParameter().addAll(getVariableFactory().getDefinedParameters());
 		
 		return new MacroOutput() {
 			@Override
