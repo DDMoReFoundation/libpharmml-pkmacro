@@ -43,11 +43,11 @@ class Transfer extends AbstractMacro implements CompartmentTargeter{
 		Utils.addOperand(from.getAmount(), Binoperator.MINUS, exp2);
 	}
 
-	static Transfer fromMacro(Translator tl, TransferMacro macro) throws InvalidMacroException {
+	static Transfer fromMacro(CompartmentFactory cf, VariableFactory vf, TransferMacro macro) throws InvalidMacroException {
 		ParamResolver pr = new ParamResolver(macro);
 		
-		AbstractCompartment from = tl.getCompartment(pr.getValue("from").getContent().toString());
-		AbstractCompartment to = tl.getCompartment(pr.getValue("to").getContent().toString());
+		AbstractCompartment from = cf.getCompartment(pr.getValue("from").getContent().toString());
+		AbstractCompartment to = cf.getCompartment(pr.getValue("to").getContent().toString());
 		Operand rate = pr.getValue(TransferMacro.Arg.KT, Operand.class);
 		
 		return new Transfer(from, to, rate);

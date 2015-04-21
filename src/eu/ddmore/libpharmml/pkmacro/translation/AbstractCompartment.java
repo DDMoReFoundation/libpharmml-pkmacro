@@ -41,9 +41,8 @@ abstract class AbstractCompartment extends AbstractMacro implements EquationSour
 		return concentration;
 	}
 
-	protected static DerivativeVariable resolveDerivativeVariable(Translator tl, SymbolRef sref) throws InvalidMacroException{
+	protected static DerivativeVariable resolveDerivativeVariable(VariableFactory vf, SymbolRef sref) throws InvalidMacroException{
 		String symbId = sref.getSymbIdRef();
-		VariableFactory vf = tl.getVariableFactory();
 		DerivativeVariable dv;
 		if(symbId == null){
 			throw new InvalidMacroException("Missing symbIdRef attribute in SymbRef.");
@@ -63,9 +62,8 @@ abstract class AbstractCompartment extends AbstractMacro implements EquationSour
 		return dv;
 	}
 	
-	protected static VariableDefinition resolveVariable(Translator tl, SymbolRef sref) throws InvalidMacroException{
+	protected static VariableDefinition resolveVariable(VariableFactory vf, SymbolRef sref) throws InvalidMacroException{
 		String symbId = sref.getSymbIdRef();
-		VariableFactory vf = tl.getVariableFactory();
 		VariableDefinition v;
 		if(symbId == null){
 			throw new InvalidMacroException("Missing symbIdRef attribute in SymbRef.");

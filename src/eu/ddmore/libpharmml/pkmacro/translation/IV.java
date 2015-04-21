@@ -15,7 +15,7 @@ class IV extends AbstractMacro implements InputSource {
 		this.adm = adm;
 	}
 	
-	static IV fromMacro(Translator tl, IVMacro macro) throws InvalidMacroException{
+	static IV fromMacro(CompartmentFactory cf, VariableFactory vf, IVMacro macro) throws InvalidMacroException{
 		ParamResolver pr = new ParamResolver(macro);
 		
 		Scalar adm;
@@ -25,7 +25,7 @@ class IV extends AbstractMacro implements InputSource {
 			adm = pr.getValue("adm", Scalar.class);
 		}
 		
-		AbstractCompartment target = tl.getCompartment(pr.getValue("cmt").getContent().toString());
+		AbstractCompartment target = cf.getCompartment(pr.getValue("cmt").getContent().toString());
 		
 		return new IV(target, adm);
 	}

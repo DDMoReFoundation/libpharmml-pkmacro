@@ -13,13 +13,13 @@ class Compartment extends AbstractCompartment {
 		super(cmt, amount, volume, concentration);
 	}
 
-	static Compartment fromMacro(Translator tr, CompartmentMacro macro) throws InvalidMacroException{
+	static Compartment fromMacro(CompartmentFactory cf, VariableFactory vf, CompartmentMacro macro) throws InvalidMacroException{
 		ParamResolver resolver = new ParamResolver(macro);
 		
 		// Required parameters
 		Rhs rhs_cmt = resolver.getValue("cmt");
 		SymbolRef s = resolver.getValue("amount", SymbolRef.class);
-		DerivativeVariable dv = resolveDerivativeVariable(tr, s);
+		DerivativeVariable dv = resolveDerivativeVariable(vf, s);
 		
 		// Optionals
 		Operand volume;
@@ -36,7 +36,7 @@ class Compartment extends AbstractCompartment {
 		}
 		String cmt = rhs_cmt.getContent().toString();
 		Compartment comp = new Compartment(cmt, dv, volume, concentration);
-		tr.addCompartment(comp);
+		cf.addCompartment(comp);
 		return comp;
 	}
 	

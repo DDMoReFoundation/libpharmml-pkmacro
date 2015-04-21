@@ -24,11 +24,11 @@ class Depot extends AbstractMacro implements InputSource {
 		this.ka = ka;
 	}
 	
-	static Depot fromMacro(Translator tl, DepotMacro macro) throws InvalidMacroException{
+	static Depot fromMacro(CompartmentFactory cf, VariableFactory vf, DepotMacro macro) throws InvalidMacroException{
 		ParamResolver pr = new ParamResolver(macro);
 		
 		SymbolRef targetRef = pr.getValue(DepotMacro.Arg.TARGET, SymbolRef.class);
-		DerivativeVariable target = AbstractCompartment.resolveDerivativeVariable(tl, targetRef);
+		DerivativeVariable target = AbstractCompartment.resolveDerivativeVariable(vf, targetRef);
 		
 		Scalar adm = pr.getValue(DepotMacro.Arg.ADM, Scalar.class);
 		
@@ -37,11 +37,11 @@ class Depot extends AbstractMacro implements InputSource {
 			ka = pr.getValue(DepotMacro.Arg.KA, Operand.class);
 			// Depot with ka equals to compartment and oral macros
 			getLogger().info("Depot macro translated to 1 Compartment and 1 Oral");
-			Compartment comp = new Compartment(String.valueOf(tl.compartmentsSize()+1), target, null, null);
-			tl.addCompartment(comp);
-			tl.addAbsOral(new Absorption(
+			Compartment comp = new Compartment(String.valueOf(cf.compartmentsSize()+1), target, null, null);
+			cf.addCompartment(comp);
+			cf.addCompartment(new Absorption(
 					adm, null, null, ka, null, null, comp, Absorption.Type.FIRST_ORDER, 
-					comp.getCmt(), target, tl));
+					String.valueOf(cf.compartmentsSize()+1), target, vf));
 		} else {
 			ka = null;
 		}

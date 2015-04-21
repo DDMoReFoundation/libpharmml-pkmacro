@@ -25,11 +25,11 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 	private final Operand outRate;
 	private final AbstractCompartment target;
 	
-	static Peripheral fromMacro(Translator tl, PeripheralMacro macro) throws InvalidMacroException{
+	static Peripheral fromMacro(CompartmentFactory cf, VariableFactory vf, PeripheralMacro macro) throws InvalidMacroException{
 		ParamResolver resolver = new ParamResolver(macro);
 		
 		SymbolRef amountRef = resolver.getValue("amount", SymbolRef.class);
-		DerivativeVariable amount = resolveDerivativeVariable(tl, amountRef);
+		DerivativeVariable amount = resolveDerivativeVariable(vf, amountRef);
 //		this.amount = s.getSymbIdRef();
 		
 		// Looking for transfer rates
@@ -44,11 +44,11 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 				if(firstIndexes[0] == null){ // first tranfer rate met
 					firstIndexes[0] = tr.getFrom();
 					firstIndexes[1] = tr.getTo();
-					if(tl.compartmentExists(tr.getFrom().toString())){
+					if(cf.compartmentExists(tr.getFrom().toString())){
 						periphCmt = tr.getTo();
 						centralCmt = tr.getFrom();
 						inRate = resolver.getValue(Translator.getArgumentName(macroValue), Operand.class);
-					} else if (tl.compartmentExists(tr.getTo().toString())){
+					} else if (cf.compartmentExists(tr.getTo().toString())){
 						periphCmt = tr.getFrom();
 						centralCmt = tr.getTo();
 						outRate = resolver.getValue(Translator.getArgumentName(macroValue), Operand.class);
@@ -70,9 +70,9 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 			}
 		}
 		
-		AbstractCompartment central = tl.getCompartment(centralCmt.toString());
+		AbstractCompartment central = cf.getCompartment(centralCmt.toString());
 		Peripheral periph = new Peripheral(periphCmt.toString(), amount, null, null, inRate, outRate, central);
-		tl.addCompartment(periph);
+		cf.addCompartment(periph);
 		return periph;
 	}
 	

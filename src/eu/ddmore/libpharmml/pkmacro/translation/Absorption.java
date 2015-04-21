@@ -30,7 +30,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	protected CommonVariableDefinition inputTarget;
 		
 	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, 
-			AbstractCompartment target, Type type, String cmt, DerivativeVariable amount, Translator tl) {
+			AbstractCompartment target, Type type, String cmt, DerivativeVariable amount, VariableFactory vf) {
 		super(cmt, amount, null, null);
 		this.adm = adm;
 		Tlag = tlag;
@@ -42,15 +42,15 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		this.type = type;
 		
 		if(type.equals(Type.TRANSIT)){
-			generateTransitODE(tl);
+			generateTransitODE(vf);
 		} else if (type.equals(Type.FIRST_ORDER)) {
-			generateFirstOrderODE(tl);
+			generateFirstOrderODE(vf);
 		} else {
-			generateZeroOrderODE(tl);
+			generateZeroOrderODE(vf);
 		}
 	}
 
-	static Absorption fromMacro(Translator tl, AbsorptionOralMacro macro) throws InvalidMacroException{
+	static Absorption fromMacro(CompartmentFactory cf, VariableFactory vf, AbsorptionOralMacro macro) throws InvalidMacroException{
 		ParamResolver pr = new ParamResolver(macro);
 		
 		Scalar adm;
@@ -81,20 +81,20 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 			Mtt = pr.getValue(AbsorptionOralMacro.Arg.MTT, Operand.class);
 		}
 		
-		AbstractCompartment target = tl.getCompartment(
+		AbstractCompartment target = cf.getCompartment(
 				pr.getValue(AbsorptionOralMacro.Arg.CMT).getContent().toString());
 		
 		Type type = null;
 		DerivativeVariable amount;
 		if(Tk0 != null){
 			type = Type.ZERO_ORDER;
-			amount = tl.getVariableFactory().generateDerivativeVariable("Ad");
+			amount = vf.generateDerivativeVariable("Ad");
 		} else if(ka != null && (Ktr == null || Mtt == null)){
 			type = Type.FIRST_ORDER;
-			amount = tl.getVariableFactory().generateDerivativeVariable("Ad");
+			amount = vf.generateDerivativeVariable("Ad");
 		} else if(Ktr != null && Mtt != null){
 			type = Type.TRANSIT;
-			amount = tl.getVariableFactory().generateDerivativeVariable("Aa");
+			amount = vf.generateDerivativeVariable("Aa");
 		} else {
 			throw new InvalidMacroException("Absorption/Oral macro must have the following prameters: "
 					+ "Tk0, ka or [Ktr and Mtt]");
@@ -102,7 +102,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		
 		
 		Absorption abs = new Absorption(adm, Tlag, Tk0, ka, Ktr, Mtt, target,
-				type, String.valueOf(tl.compartmentsSize()), amount, tl);
+				type, String.valueOf(cf.compartmentsSize()), amount, vf);
 		return abs;
 	}
 	
@@ -130,7 +130,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		}
 	}
 	
-	protected void generateZeroOrderODE(Translator tl){
+	protected void generateZeroOrderODE(VariableFactory varFac){
 		Equation eq = new Equation();
 		Uniop uniop = new Uniop(Unioperator.MINUS, (ExpressionValue) Tk0);
 		eq.setUniop(uniop);
@@ -138,7 +138,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		inputTarget = amount;
 	}
 	
-	protected void generateFirstOrderODE(Translator tl){
+	protected void generateFirstOrderODE(VariableFactory varFac){
 		Equation eq = new Equation();
 		Uniop uniop = new Uniop();
 		uniop.setOperator(Unioperator.MINUS);
@@ -149,8 +149,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		inputTarget = amount;
 	}
 	
-	protected void generateTransitODE(Translator tl){		
-		VariableFactory varFac = tl.getVariableFactory();
+	protected void generateTransitODE(VariableFactory varFac){		
 		VariableDefinition dose = varFac.generateVariable("Dose");
 		SymbolRef doseRef = new SymbolRef(dose.getSymbId());
 		VariableDefinition t_dose = varFac.generateVariable("t_Dose");

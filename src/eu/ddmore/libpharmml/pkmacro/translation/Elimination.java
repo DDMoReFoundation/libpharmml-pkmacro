@@ -41,10 +41,10 @@ class Elimination extends AbstractMacro implements CompartmentTargeter {
 		return new Elimination(null, null, null, km, vm, Type.SATURABLE, target);
 	}
 	
-	static Elimination fromMacro(Translator tl, EliminationMacro macro) throws InvalidMacroException{
+	static Elimination fromMacro(CompartmentFactory cf, VariableFactory vf, EliminationMacro macro) throws InvalidMacroException{
 		ParamResolver resolver = new ParamResolver(macro);
 		
-		AbstractCompartment target = tl.getCompartment(resolver.getValue("cmt").getContent().toString());
+		AbstractCompartment target = cf.getCompartment(resolver.getValue("cmt").getContent().toString());
 		
 		if(resolver.contains("k")){
 			return createLinear(target,resolver.getValue("k",Operand.class));

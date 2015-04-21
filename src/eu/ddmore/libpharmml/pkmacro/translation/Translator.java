@@ -1,9 +1,7 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
@@ -29,58 +27,14 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  *
  */
 public class Translator {
-	
-	private List<CompartmentMacro> macro_compartments;
-	private List<PeripheralMacro> macro_peripherals;
-	private List<AbsorptionOralMacro> macro_absorals;
-	private List<IVMacro> macro_ivs;
-	private List<TransferMacro> macro_transfers;
-	private List<EliminationMacro> macro_eliminations;
-	private List<EffectMacro> macro_effects;
-	private List<DepotMacro> macro_depots;
-	
-	private final Map<String, AbstractCompartment> map_compartments;
-	
-	private final List<AbstractMacro> model;
-	
-	private final VariableFactory variableFactory;
-	
-	public Translator(StructuralModel sm){
-		PKMacroList macros = sm.getPKmacros();
 		
-		// Sorting macros first
-		macro_compartments = new ArrayList<CompartmentMacro>();
-		macro_peripherals = new ArrayList<PeripheralMacro>();
-		macro_absorals = new ArrayList<AbsorptionOralMacro>();
-		macro_ivs = new ArrayList<IVMacro>();
-		macro_transfers = new ArrayList<TransferMacro>();
-		macro_eliminations = new ArrayList<EliminationMacro>();
-		macro_effects = new ArrayList<EffectMacro>();
-		macro_depots = new ArrayList<DepotMacro>();
-		map_compartments = new HashMap<String, AbstractCompartment>();
-		for(PKMacro macro : macros.getListOfMacro()){
-			if(macro instanceof CompartmentMacro){
-				macro_compartments.add((CompartmentMacro) macro);
-			} else if (macro instanceof PeripheralMacro){
-				macro_peripherals.add((PeripheralMacro) macro);
-			} else if (macro instanceof AbsorptionOralMacro){
-				macro_absorals.add((AbsorptionOralMacro) macro);
-			} else if (macro instanceof IVMacro){
-				macro_ivs.add((IVMacro) macro);
-			} else if (macro instanceof TransferMacro){
-				macro_transfers.add((TransferMacro) macro);
-			} else if (macro instanceof EliminationMacro){
-				macro_eliminations.add((EliminationMacro) macro);
-			} else if (macro instanceof EffectMacro){
-				macro_effects.add((EffectMacro) macro);
-			} else if (macro instanceof DepotMacro){
-				macro_depots.add((DepotMacro) macro);
-			}
-		}
-		
-		variableFactory = new VariableFactory(sm);
-		
-		model = new ArrayList<AbstractMacro>();
+//	private final List<AbstractMacro> model;
+	
+//	private final VariableFactory variableFactory;
+	
+	
+	public Translator(){
+
 	}
 	
 	/**
@@ -88,35 +42,43 @@ public class Translator {
 	 * Equations are added by each fromMacro() method execution.
 	 * @throws InvalidMacroException
 	 */
-	private void parseMacros() throws InvalidMacroException{
-
-		// Core
-		for(CompartmentMacro macro : macro_compartments){
-			model.add(Compartment.fromMacro(this, macro));
-		}
-		for(PeripheralMacro macro : macro_peripherals){
-			model.add(Peripheral.fromMacro(this, macro));
+	private List<AbstractMacro> parseMacros(PKMacroList list, CompartmentFactory cf, VariableFactory vf) throws InvalidMacroException{
+		
+		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
+		
+		// Core macros
+		for(PKMacro xmlMacro : list.getListOfMacro()){
+			if(xmlMacro instanceof CompartmentMacro){
+				model.add(Compartment.fromMacro(cf, vf, (CompartmentMacro) xmlMacro));
+			}
+			else if(xmlMacro instanceof PeripheralMacro){
+				model.add(Peripheral.fromMacro(cf, vf, (PeripheralMacro) xmlMacro));
+			}
 		}
 		
-		// Targetted/Input macros
-		for(AbsorptionOralMacro macro : macro_absorals){
-			model.add(Absorption.fromMacro(this, macro));
+		// Targetted macros
+		for(PKMacro xmlMacro : list.getListOfMacro()){
+			if(xmlMacro instanceof AbsorptionOralMacro){
+				model.add(Absorption.fromMacro(cf, vf, (AbsorptionOralMacro) xmlMacro));
+			}
+			else if(xmlMacro instanceof IVMacro){
+				model.add(IV.fromMacro(cf, vf, (IVMacro) xmlMacro));
+			}
+			else if(xmlMacro instanceof TransferMacro){
+				model.add(Transfer.fromMacro(cf, vf, (TransferMacro) xmlMacro));
+			}
+			else if(xmlMacro instanceof EliminationMacro){
+				model.add(Elimination.fromMacro(cf, vf, (EliminationMacro) xmlMacro));
+			}
+			else if(xmlMacro instanceof EffectMacro){
+				model.add(Effect.fromMacro(cf, vf, (EffectMacro) xmlMacro));
+			}
+			else if(xmlMacro instanceof DepotMacro){
+				model.add(Depot.fromMacro(cf, vf, (DepotMacro) xmlMacro));
+			}
 		}
-		for(IVMacro macro : macro_ivs){
-			model.add(IV.fromMacro(this, macro));
-		}
-		for(TransferMacro macro : macro_transfers){
-			model.add(Transfer.fromMacro(this, macro));
-		}
-		for(EliminationMacro macro : macro_eliminations){
-			model.add(Elimination.fromMacro(this,macro));
-		}
-		for(EffectMacro macro : macro_effects){
-			model.add(Effect.fromMacro(this, macro));
-		}
-		for(DepotMacro macro : macro_depots){
-			model.add(Depot.fromMacro(this, macro));
-		}
+		
+		return model;
 		
 	}
 	
@@ -131,32 +93,6 @@ public class Translator {
 //		return map_compartments.get(cmt);
 //	}
 	
-	AbstractCompartment getCompartment(String cmt) throws InvalidMacroException{
-		if(map_compartments.containsKey(cmt)){
-			return map_compartments.get(cmt);
-		} else {
-			throw new InvalidMacroException("Compartment \""+cmt+"\" does not exist");
-		}
-	}
-	
-	void addCompartment(AbstractCompartment comp) throws InvalidMacroException{
-		AbstractCompartment previous = map_compartments.put(comp.getCmt(), comp);
-		if(previous != null){
-			throw new InvalidMacroException("Compartment \""+comp.getCmt()+"\" is duplicated");
-		}
-	}
-	
-	void addAbsOral(Absorption abs){
-		model.add(abs);
-	}
-	
-	Integer compartmentsSize(){
-		return map_compartments.size();
-	}
-	
-	boolean compartmentExists(String cmt){
-		return map_compartments.containsKey(cmt);
-	}
 	
 	static String getArgumentName(MacroValue value){
 		if(value.getArgument() != null){
@@ -168,17 +104,15 @@ public class Translator {
 		}
 	}
 	
-	/**
-	 * Translates the given structural model into equations and input data.
-	 * @return A {@link MacroOutput} object that contains a new structural model and the input data.
-	 * @throws InvalidMacroException If any macro contained in the initial structural model is not valid.
-	 */
-	public MacroOutput translate() throws InvalidMacroException{
+	public MacroOutput translate(StructuralModel sm) throws InvalidMacroException{
 		
-		parseMacros();
+		VariableFactory vf = new VariableFactory(sm);
+		CompartmentFactory cf = new CompartmentFactory();
 		
-		final StructuralModel sm = new StructuralModel();
-		sm.setBlkId("translated_sm");
+		List<AbstractMacro> model = parseMacros(sm.getPKmacros(),cf,vf);
+		
+		final StructuralModel translated_sm = new StructuralModel();
+		translated_sm.setBlkId("translated_sm");
 		
 		final InputList inputList = new InputList();
 		
@@ -191,21 +125,21 @@ public class Translator {
 			}
 		}
 		
-		for(CommonVariableDefinition var : getVariableFactory().getDefinedVariables()){
+		for(CommonVariableDefinition var : vf.getDefinedVariables()){
 			if(var instanceof DerivativeVariable){
-				sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createDerivativeVariable(
+				translated_sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createDerivativeVariable(
 						(DerivativeVariable) var));
 			} else if (var instanceof VariableDefinition){
-				sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createVariable(
+				translated_sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createVariable(
 						(VariableDefinition) var));
 			}
 		}
-		sm.getSimpleParameter().addAll(getVariableFactory().getDefinedParameters());
+		translated_sm.getSimpleParameter().addAll(vf.getDefinedParameters());
 		
 		return new MacroOutput() {
 			@Override
 			public StructuralModel getStructuralModel() {
-				return sm;
+				return translated_sm;
 			}
 			@Override
 			public List<Input> getListOfInput() {
@@ -214,14 +148,4 @@ public class Translator {
 		};
 	}
 	
-	/**
-	 * Location where the variables are stored and generated. All variables created in macros must
-	 * be refered in this factory. The content will be pasted to the variable list of the generated
-	 * structural model.
-	 * @return A {@link VariableFactory} object.
-	 */
-	VariableFactory getVariableFactory(){
-		return variableFactory;
-	}
-
 }
