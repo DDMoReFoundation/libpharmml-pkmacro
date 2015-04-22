@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="libPharmML-PKMacro" default="jar-all" basedir=".">
+	<property name="build.dir" location="build"/>
+	<property name="src.dir" location="./src"/>
+	<property name="test.dir" location="./test"/>
+	<property name="lib.dir" location="./libs"/>
+    <property name="jar.dir" location="./jars" />
+	<property name="ivy.lib.dir" location="./ivy_libs"/>
+    <property name="target" value="1.6" />
+    <property name="source" value="1.6" />
+
+	<!-- Edit version and build values if needed -->
+	<property name="libpharmml.name" value="libPharmML-PKMacro"/>
+	<property name="libpharmml.version" value="0.1"/>
+	<property name="libpharmml.build" value="1"/>
+	<property name="libpharmml.fullname" value="${libpharmml.name}-${libpharmml.version}-b${libpharmml.build}"/>
+	
+	<property name="src.bin.dir" location="${build.dir}/src"/>
+	<property name="test.bin.dir" location="${build.dir}/test"/>
+	<property name="docs.build.dir" location="${build.dir}/docs"/>
+	<property name="test.output.dir" location="${build.dir}/test_output"/>
+	<!--<property name="jaxb.gen.dir" location="${src.dir}/eu/ddmore/libpharmml/dom"/>-->
+	<property name="schema.dir" location="definitions"/>
+	<property name="schema.file" location="${schema.dir}/pharmml.xsd"/>
+	<property name="catalog.file" location="${schema.dir}/xmlCatalog.xml"/>
+	<property name="impl.pkg.path" value="eu/ddmore/libpharmml/impl"/>
+	<property name="libpharmml.jar" value="${libpharmml.fullname}.jar"/>
+    <property name="jar.name.src" value="${libpharmml.fullname}-src.jar" />
+    <property name="jar.name.doc" value="${libpharmml.fullname}-docs.jar" />
+
+
+	<property name="jaxb.gen.package" value="eu.ddmore.libpharmml.generated"/>
+
+	<path id="ivy.lib.path">
+		<pathelement location="${lib.dir}/ivy-2.3.0.jar" />
+	</path>
+
+	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant"
+	            classpathref="ivy.lib.path"/>
+
+	<path id="src.path">
+		<fileset dir="${ivy.lib.dir}/src-build"/>
+		<!--pathelement location="${src.dir}"/>
+		<pathelement location="${lib.dir}/jaxb-ri-2.2.7/lib/jaxb-api.jar"/>
+		<pathelement location="${lib.dir}/jaxb-ri-2.2.7/lib/jaxb-core.jar"/>
+		<pathelement location="${lib.dir}/xerces-2_11_0/xercesImpl.jar"/>
+		<pathelement location="${lib.dir}/xerces-2_11_0/resolver.jar"/-->
+	</path>
+
+	<path id="test.path">
+		<pathelement location="${jar.dir}/${libpharmml.jar}"/>
+		<fileset dir="${ivy.lib.dir}/src-build"/>
+		<fileset dir="${ivy.lib.dir}/test-build"/>
+	</path>
+
+<!--	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+		<classpath>
+			<fileset dir="${lib.dir}" includes="jaxb*.jar"/>
+		</classpath>
+	</taskdef>-->
+
+	<target name="build-all" depends="build-src" description="Build everything">
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" depends="clean-build,clean-ivy,clean-jars" description="Clean everything">
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clean-build                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="clean-build">
+		<delete  dir="${build.dir}"/>
+	</target>
+
+	<target name="clean-ivy">
+		<delete dir="${ivy.lib.dir}"/>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clean-jars                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="clean-jars">
+        <delete dir="${jar.dir}" />
+    </target>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clean-jaxb                      
+         - - - - - - - - - - - - - - - - - -->
+<!--	<target name="clean-jaxb">
+		<delete quiet="false" verbose="true" dir="${jaxb.gen.dir}"/>
+	</target>-->
+
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: init                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${src.bin.dir}"/>
+		<mkdir dir="${test.bin.dir}"/>
+		<!--<mkdir dir="${jaxb.gen.dir}"/>-->
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: jaxb-gen                      
+         - - - - - - - - - - - - - - - - - -->
+<!--	<target name="jaxb-gen">
+		<xjc destdir="${src.dir}" removeOldOutput="yes" catalog="${catalog.file}"
+			 binding="binding.xjb" extension="true">-->
+			<!-- package="${jaxb.gen.package}"  -->
+<!--			<schema dir="${schema.dir}" includes="pharmml.xsd"/>
+			<produces dir="${jaxb.gen.dir}" includes="**/*"/>
+		</xjc>
+	</target>-->
+
+	<target name="retrieve" depends="">
+		<ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]"/>
+	</target>
+
+	<!-- ================================= 
+          target: build-src              
+         ================================= -->
+	<target name="build-src" depends="init,retrieve" description="Build src files.">
+		<javac srcdir="${src.dir}"
+         destdir="${src.bin.dir}"
+         includeantruntime="no"
+         classpathref="src.path"
+         source="${source}"
+         target="${target}"
+         debug="on"/>
+		<copy todir="${src.bin.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+				<exclude name="**/*.class" />
+			</fileset>
+		</copy>
+		<copy todir="${src.bin.dir}/${impl.pkg.path}">
+			<fileset dir="${src.dir}/${impl.pkg.path}">
+        		<include name="*"/>
+        		<exclude name="*.xpr"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- ================================= 
+          target: api-docs              
+         ================================= -->
+    <target name="api-docs">
+        <javadoc access="package" author="true" splitindex="true" use="true" version="true" source="${source}"
+            	sourcepath="${src.dir}" destdir="${docs.build.dir}" doctitle="libPharmML" 
+            	nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
+                    <classpath refid="src.path" />
+            </javadoc>
+    </target>
+	
+	<!-- ================================= 
+          target: jar-file              
+         ================================= -->
+    <target name="jar-bin" depends="build-src,init-jardir" description="Generate a jar for distribution of the library">
+        <jar destfile="${jar.dir}/${libpharmml.jar}">
+        	<fileset dir="${src.bin.dir}"/>
+        	<!--fileset dir="${schema.dir}">
+        		<include name="*"/>
+        		<exclude name="*.xpr"/>
+        	</fileset-->
+        </jar>
+    </target>
+
+	<!-- ================================= 
+          target: jar-all           
+         ================================= -->
+    <target name="jar-all" description="creates all jar files for distribution"
+    	depends="jar-bin, jar-src, jar-docs"/>
+    
+    <target name="jar-docs" depends="api-docs,init-jardir">
+            <mkdir dir="${jar.dir}" />
+            <jar destfile="${jar.dir}/${jar.name.doc}">
+                    <fileset dir="${docs.build.dir}" />
+            </jar>
+    </target>
+                            
+    <target name="init-jardir">
+            <delete dir="${jar.dir}" />
+            <mkdir dir="${jar.dir}" />
+    </target>
+
+    <target name="jar-src" depends="init-jardir">
+            <jar destfile="${jar.dir}/${jar.name.src}">
+                    <fileset dir="${src.dir}" />
+            </jar>
+    </target>
+	
+	<!-- ================================= 
+          target: build-test              
+         ================================= -->
+	<target name="build-test" depends="init,retrieve,jar-bin" description="Build test files">
+		<javac srcdir="${test.dir}"
+         destdir="${test.bin.dir}"
+         includeantruntime="no"
+         classpathref="test.path"
+         source="${source}"
+         target="${target}"
+         debug="on"/>
+		<copy todir="${test.bin.dir}">
+			<fileset dir="${test.dir}">
+				<exclude name="**/*.java" />
+				<exclude name="**/*.class" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- ================================= 
+          target: run-tests              
+         ================================= -->
+	<target name="run-tests" depends="gen-reports" description="Runs unit tests and generates html reports"/>
+	
+	<target name="run-junit" depends="build-test" description="description">
+		<delete dir="${test.output.dir}/logs" />
+		<mkdir dir="${test.output.dir}/logs" />
+		<junit printsummary="yes" haltonfailure="no" fork="true" maxmemory="512m">
+			<classpath>
+				<path refid="test.path"/>
+				<pathelement location="${test.bin.dir}"/>
+			</classpath>
+			<batchtest todir="${test.output.dir}/logs">
+				<formatter type="xml" />
+				<fileset dir="${test.bin.dir}">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="gen-reports" depends="run-junit" description="description">
+		<!-- clean report directory -->
+		<delete dir="${test.output.dir}/junitReports" />
+		<mkdir dir="${test.output.dir}/junitReports" />
+
+		<!-- generate report -->
+		<junitreport todir="${test.output.dir}/junitReports">
+			<fileset dir="${test.output.dir}/logs" includes="**/*.xml" />
+			<report todir="${test.output.dir}/junitReports" />
+		</junitreport>
+	</target>
+
+</project>

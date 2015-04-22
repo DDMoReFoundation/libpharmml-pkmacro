@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.    
+-->
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info
+        organisation="uk.ac.ebi"
+        module="libpharmml"
+        status="integration">
+	</info>
+	<configurations>
+		<conf name="src-build"  description="builds src code"/>
+		<conf name="test-build"  description="builds code for testing"/>
+	</configurations>
+	<dependencies>
+		<dependency org="com.sun.xml.bind" name="jaxb-impl" rev="2.2.7" conf="src-build->default"/> 
+		<dependency org="xerces" name="xercesImpl" rev="2.11.0" conf="src-build->default"/>
+		<dependency org="xml-resolver" name="xml-resolver" rev="1.2" conf="src-build->default"/>
+		<!--<dependency org="junit" name="junit-dep" rev="4.11" conf="test-build->default"/>-->
+		<dependency org="eu.ddmore.pharmml" name="libPharmML" rev="0.4-beta-b3" conf="src-build->default"/>
+		<!--dependency org="junit" name="junit" rev="4.11" conf="test-build->default"/--> 
+	</dependencies>
+</ivy-module>
