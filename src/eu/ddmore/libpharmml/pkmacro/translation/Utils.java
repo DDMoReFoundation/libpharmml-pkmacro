@@ -82,6 +82,8 @@ public class Utils {
 				sb.append(v.getAssign().getEquation().getBinop());
 			} else if (v.getAssign().getEquation().getUniop() != null){
 				sb.append(v.getAssign().getEquation().getUniop());
+			} else if (v.getAssign().getEquation().getPiecewise() != null){
+				sb.append(v.getAssign().getEquation().getPiecewise());
 			}
 		}
 		return sb.toString();
