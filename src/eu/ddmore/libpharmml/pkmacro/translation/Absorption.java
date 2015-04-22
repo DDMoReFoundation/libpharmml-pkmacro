@@ -1,15 +1,22 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
+import eu.ddmore.libpharmml.dom.maths.Condition;
 import eu.ddmore.libpharmml.dom.maths.Equation;
 import eu.ddmore.libpharmml.dom.maths.ExpressionValue;
+import eu.ddmore.libpharmml.dom.maths.LogicBinOp;
 import eu.ddmore.libpharmml.dom.maths.Operand;
+import eu.ddmore.libpharmml.dom.maths.Otherwise;
+import eu.ddmore.libpharmml.dom.maths.Piece;
+import eu.ddmore.libpharmml.dom.maths.Piecewise;
 import eu.ddmore.libpharmml.dom.maths.Uniop;
 import eu.ddmore.libpharmml.dom.maths.Unioperator;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.AbsorptionOralMacro;
@@ -124,7 +131,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	public void modifyTargetODE() {
 		switch (type) {
 		case ZERO_ORDER:
-			Utils.addOperand(target.getAmount(),Binoperator.PLUS, Tk0);
+			Utils.addOperand(target.getAmount(),Binoperator.PLUS, new SymbolRef(zeroOrderRate.getSymbId()));
 			break;
 		case FIRST_ORDER:
 			Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(amount.getSymbId()));
@@ -137,18 +144,51 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		}
 	}
 	
-	protected void generateZeroOrderODE(VariableFactory varFac){
+	protected void generateZeroOrderODE(VariableFactory vf){
 		// Create variables
+		zeroOrderRate = vf.createVariable("ZeroOrderRate", Integer.valueOf(getCmt()));
+		lastDoseAmountToAd = vf.createVariable("LastDoseAmountToAd", Integer.valueOf(getCmt()));
 		
+		// dAd/dt = -ZeroInputRate
+		Equation compartment_eq = new Equation();
+		compartment_eq.setUniop(new Uniop(Unioperator.MINUS, new SymbolRef(zeroOrderRate.getSymbId())));
+		amount.assign(compartment_eq);
+
+		// if (Ad > 0) { ZeroOrderRate = LastDoseAmountToAd / Tk0 } else { ZeroOrderRate = 0 }
+		Piecewise pw = new Piecewise();
+		
+		// Ad > 0
+		Piece piece_Ad_gt_0 = new Piece();
+		Condition condition_Ad_gt_0 = new Condition();
+		LogicBinOp logic = new LogicBinOp();
+		logic.setOp("gt");
+		logic.getContent().add(MasterObjectFactory.COMMONTYPES_OF.createDerivativeVariable(amount));
+		logic.getContent().add(MasterObjectFactory.COMMONTYPES_OF.createInt(new IntValue(0)));
+		condition_Ad_gt_0.setLogicBinop(logic);
+		piece_Ad_gt_0.setCondition(condition_Ad_gt_0);
+		piece_Ad_gt_0.setValue(new Binop(
+				Binoperator.DIVIDE, 
+				new SymbolRef(lastDoseAmountToAd.getSymbId()), 
+				Tk0));
+	
+		// Else
+		Piece piece_else = new Piece();
+		piece_else.setValue(new IntValue(0));
+		Condition condition_else = new Condition();
+		condition_else.setOtherwise(new Otherwise());
+		piece_else.setCondition(condition_else);
+		
+		pw.getPiece().add(piece_Ad_gt_0);
+		pw.getPiece().add(piece_else);
 		
 		Equation eq = new Equation();
-		Uniop uniop = new Uniop(Unioperator.MINUS, (ExpressionValue) Tk0);
-		eq.setUniop(uniop);
-		amount.assign(eq);
+		eq.setPiecewise(pw);
+		zeroOrderRate.assign(eq);
+		
 		inputTarget = amount;
 	}
 	
-	protected void generateFirstOrderODE(VariableFactory varFac){
+	protected void generateFirstOrderODE(VariableFactory vf){
 		Equation eq = new Equation();
 		Uniop uniop = new Uniop();
 		uniop.setOperator(Unioperator.MINUS);
@@ -159,13 +199,13 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		inputTarget = amount;
 	}
 	
-	protected void generateTransitODE(VariableFactory varFac){		
-		VariableDefinition dose = varFac.generateVariable("Dose");
+	protected void generateTransitODE(VariableFactory vf){		
+		VariableDefinition dose = vf.generateVariable("Dose");
 		SymbolRef doseRef = new SymbolRef(dose.getSymbId());
-		VariableDefinition t_dose = varFac.generateVariable("t_Dose");
+		VariableDefinition t_dose = vf.generateVariable("t_Dose");
 		SymbolRef t_doseRef = new SymbolRef(t_dose.getSymbId());
-		SymbolRef n = varFac.createAndReferNewParameter("n");
-		SymbolRef f = varFac.createAndReferNewParameter("F");
+		SymbolRef n = vf.createAndReferNewParameter("n");
+		SymbolRef f = vf.createAndReferNewParameter("F");
 		SymbolRef t = new SymbolRef("t"); // must be defined as IndependentVariable
 		
 		// log(F*Dose)
