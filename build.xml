@@ -120,6 +120,7 @@
 	</target>-->
 
 	<target name="retrieve" depends="">
+		<ivy:settings file="ivysettings.xml"/>
 		<ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]"/>
 	</target>
 
