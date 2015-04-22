@@ -64,7 +64,7 @@ public class Utils {
 	public static String variableToString(DerivativeVariable dv){
 		StringBuilder sb = new StringBuilder();
 		sb.append("d"+dv.getSymbId()+"/dt = ");
-		if(dv.getAssign().getEquation() != null){
+		if(dv.getAssign() != null && dv.getAssign().getEquation() != null){
 			if(dv.getAssign().getEquation().getBinop() != null){
 				sb.append(dv.getAssign().getEquation().getBinop());
 			} else if (dv.getAssign().getEquation().getUniop() != null){
