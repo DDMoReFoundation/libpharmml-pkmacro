@@ -65,6 +65,29 @@ public class VariableFactory {
 	 * @param index
 	 * @return
 	 */
+	VariableDefinition createVariable(String prefix, Integer index){
+		if(variableExists(prefix+index)){
+			return generateVariable(prefix);
+		} else {
+			VariableDefinition v = new VariableDefinition();
+			v.setSymbId(prefix+index);
+			v.setSymbolType(SymbolType.REAL);
+			try {
+				storeVariable(v);
+			} catch (InvalidMacroException e) {
+				// Should never happen. SymbId has been checked.
+				throw new RuntimeException(e);
+			}
+			return v;
+		}
+	}
+	
+	/**
+	 * Attempt to force variable creation. If the variable name already exists, a new one will be generated.
+	 * @param prefix
+	 * @param index
+	 * @return
+	 */
 	DerivativeVariable createDerivativeVariable(String prefix, Integer index){
 		if(variableExists(prefix+index)){
 			return generateDerivativeVariable(prefix);
