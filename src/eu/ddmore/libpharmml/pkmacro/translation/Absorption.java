@@ -30,6 +30,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	protected final Operand ka;
 	protected final Operand Ktr;
 	protected final Operand Mtt;
+	protected final Operand p;
 	
 	protected final AbstractCompartment target;
 	
@@ -40,7 +41,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	protected VariableDefinition zeroOrderRate = null;
 	protected VariableDefinition lastDoseAmountToAd = null;
 		
-	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, 
+	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, Operand p,
 			AbstractCompartment target, Type type, String cmt, DerivativeVariable amount, VariableFactory vf) {
 		super(cmt, amount, null, null);
 		this.adm = adm;
@@ -51,6 +52,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		Mtt = mtt;
 		this.target = target;
 		this.type = type;
+		this.p = p;
 		
 		if(type.equals(Type.TRANSIT)){
 			generateTransitODE(vf);
@@ -91,6 +93,10 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		if(pr.contains(AbsorptionOralMacro.Arg.MTT)){
 			Mtt = pr.getValue(AbsorptionOralMacro.Arg.MTT, Operand.class);
 		}
+		Operand p = null;
+		if(pr.contains(AbsorptionOralMacro.Arg.P)){
+			p = pr.getValue(AbsorptionOralMacro.Arg.P, Operand.class);
+		}
 		
 		AbstractCompartment target = cf.getCompartment(
 				pr.getValue(AbsorptionOralMacro.Arg.CMT).getContent().toString());
@@ -114,7 +120,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		}
 		
 		
-		Absorption abs = new Absorption(adm, Tlag, Tk0, ka, Ktr, Mtt, target,
+		Absorption abs = new Absorption(adm, Tlag, Tk0, ka, Ktr, Mtt, p, target,
 				type, cmt.toString(), amount, vf);
 		cf.addCompartment(abs);
 		return abs;
@@ -278,7 +284,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 
 	@Override
 	public void generateInputs(InputList inputList) throws InvalidMacroException {
-		inputList.createInput(InputType.ORAL, adm, inputTarget);
+		inputList.createInput(InputType.ORAL, adm, inputTarget, Tlag, p);
 	}
 	
 }

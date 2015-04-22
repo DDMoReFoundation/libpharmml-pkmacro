@@ -40,7 +40,7 @@ class Depot extends AbstractMacro implements InputSource {
 			Compartment comp = new Compartment(String.valueOf(cf.compartmentsSize()+1), target, null, null);
 			cf.addCompartment(comp);
 			cf.addCompartment(new Absorption(
-					adm, null, null, ka, null, null, comp, Absorption.Type.FIRST_ORDER, 
+					adm, null, null, ka, null, null, null, comp, Absorption.Type.FIRST_ORDER, 
 					String.valueOf(cf.compartmentsSize()+1), target, vf));
 		} else {
 			ka = null;
