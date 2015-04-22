@@ -38,7 +38,7 @@ class Transfer extends AbstractMacro implements CompartmentTargeter{
 //		to.getOde().addOperand(Binoperator.PLUS, exp1);
 		Utils.addOperand(to.getAmount(), Binoperator.PLUS, exp1);
 		// from
-		Binop exp2 = new Binop(Binoperator.TIMES, rate, new SymbolRef(getTo().getAmount().getSymbId()));
+		Binop exp2 = new Binop(Binoperator.TIMES, rate, new SymbolRef(getFrom().getAmount().getSymbId()));
 //		from.getOde().addOperand(Binoperator.MINUS, exp2);
 		Utils.addOperand(from.getAmount(), Binoperator.MINUS, exp2);
 	}
