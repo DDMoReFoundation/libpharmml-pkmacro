@@ -33,7 +33,7 @@
 		<dependency org="xerces" name="xercesImpl" rev="2.11.0" conf="src-build->default"/>
 		<dependency org="xml-resolver" name="xml-resolver" rev="1.2" conf="src-build->default"/>
 		<!--<dependency org="junit" name="junit-dep" rev="4.11" conf="test-build->default"/>-->
-		<dependency org="eu.ddmore.pharmml" name="libPharmML" rev="0.4-beta-b3" conf="src-build->default"/>
+		<dependency org="eu.ddmore.pharmml" name="libPharmML" rev="0.4-b1" conf="src-build->default"/>
 		<!--dependency org="junit" name="junit" rev="4.11" conf="test-build->default"/--> 
 	</dependencies>
 </ivy-module>
