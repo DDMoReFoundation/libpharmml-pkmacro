@@ -2,3 +2,7 @@
 /.classpath
 /.project
 /.settings
+/test
+/jars
+/ivy_libs
+/build
