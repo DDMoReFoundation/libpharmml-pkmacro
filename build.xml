@@ -141,12 +141,6 @@
 				<exclude name="**/*.class" />
 			</fileset>
 		</copy>
-		<copy todir="${src.bin.dir}/${impl.pkg.path}">
-			<fileset dir="${src.dir}/${impl.pkg.path}">
-        		<include name="*"/>
-        		<exclude name="*.xpr"/>
-			</fileset>
-		</copy>
 	</target>
 
 	<!-- ================================= 
