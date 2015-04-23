@@ -81,7 +81,7 @@ public class VariableFactory {
 	 * Attempt to force variable creation. If the variable name already exists, a new one will be generated.
 	 * @param prefix
 	 * @param index
-	 * @return
+	 * @return The new {@link VariableDefinition} instance.
 	 */
 	VariableDefinition createVariable(String prefix, Integer index){
 		if(variableExists(prefix+index)){
@@ -104,7 +104,7 @@ public class VariableFactory {
 	 * Attempt to force variable creation. If the variable name already exists, a new one will be generated.
 	 * @param prefix
 	 * @param index
-	 * @return
+	 * @return The new {@link DerivativeVariable} instance.
 	 */
 	DerivativeVariable createDerivativeVariable(String prefix, Integer index){
 		if(variableExists(prefix+index)){
