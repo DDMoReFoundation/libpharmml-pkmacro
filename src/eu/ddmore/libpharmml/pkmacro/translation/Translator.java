@@ -104,6 +104,15 @@ public class Translator {
 		}
 	}
 	
+	/**
+	 * Translates the given structural model to a set of equations and input data. The equations are
+	 * listed within a transient translated structural model available through the generated {@link MacroOutput}
+	 * implementation.
+	 * @param sm The structural model that contains PK macros to be translated.
+	 * @return A {@link MacroOutput} implementation.
+	 * @throws InvalidMacroException If the translation is not possible because of any invalid
+	 * macro within the model.
+	 */
 	public MacroOutput translate(StructuralModel sm) throws InvalidMacroException{
 		
 		VariableFactory vf = new VariableFactory(sm);

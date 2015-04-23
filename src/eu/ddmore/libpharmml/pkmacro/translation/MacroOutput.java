@@ -9,16 +9,14 @@ import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 
 /**
  * Defines the output of a PharmML macro translation.
- * @author Florent Y.
- *
  */
 public interface MacroOutput {
 	
 	/**
 	 * Gets the structural model corresponding to the translated macros. This one does not contain any 
 	 * macro but only equations as {@link VariableDefinition} and {@link DerivativeVariable}.
-	 * @return The generated {@link StructuralModel} object. This one is transient, meaning that you
-	 * need to map it to a {@link ModelDefinition} mapped instance in order to marshal it.
+	 * @return The generated {@link StructuralModel} object. This one is transient, meaning that one
+	 * needs to map it to a {@link ModelDefinition} mapped instance in order to marshal it.
 	 */
 	public StructuralModel getStructuralModel();
 	
