@@ -19,7 +19,7 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
-import eu.ddmore.libpharmml.dom.commontypes.Rhs;
+import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.CompartmentMacro;
@@ -27,7 +27,7 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 class Compartment extends AbstractCompartment {
 	
-	Compartment(String cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
+	Compartment(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
 		super(cmt, amount, volume, concentration);
 	}
 
@@ -35,7 +35,7 @@ class Compartment extends AbstractCompartment {
 		ParamResolver resolver = new ParamResolver(macro);
 		
 		// Required parameters
-		Rhs rhs_cmt = resolver.getValue("cmt");
+		Integer cmt = resolver.getValue("cmt",IntValue.class).getValue().intValue();
 		SymbolRef s = resolver.getValue("amount", SymbolRef.class);
 		DerivativeVariable dv = resolveDerivativeVariable(vf, s);
 		
@@ -52,7 +52,6 @@ class Compartment extends AbstractCompartment {
 		} else {
 			concentration = null;
 		}
-		String cmt = rhs_cmt.getContent().toString();
 		Compartment comp = new Compartment(cmt, dv, volume, concentration);
 		cf.addCompartment(comp);
 		return comp;

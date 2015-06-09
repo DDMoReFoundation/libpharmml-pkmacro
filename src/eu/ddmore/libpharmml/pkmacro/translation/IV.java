@@ -18,6 +18,7 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.IVMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
@@ -43,7 +44,7 @@ class IV extends AbstractMacro implements InputSource {
 			adm = pr.getValue("adm", Scalar.class);
 		}
 		
-		AbstractCompartment target = cf.getCompartment(pr.getValue("cmt").getContent().toString());
+		AbstractCompartment target = cf.getCompartment(pr.getValue("cmt",IntValue.class).getValue().intValue());
 		
 		return new IV(target, adm);
 	}

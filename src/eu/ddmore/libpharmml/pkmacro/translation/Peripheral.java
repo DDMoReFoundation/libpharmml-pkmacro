@@ -30,7 +30,7 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 	
-	private Peripheral(String cmt, DerivativeVariable amount, Operand volume, Operand concentration, Operand inRate, Operand outRate, AbstractCompartment target) {
+	private Peripheral(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration, Operand inRate, Operand outRate, AbstractCompartment target) {
 		super(cmt, amount, volume, concentration);
 		this.inRate = inRate;
 		this.outRate = outRate;
@@ -62,11 +62,11 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 				if(firstIndexes[0] == null){ // first tranfer rate met
 					firstIndexes[0] = tr.getFrom();
 					firstIndexes[1] = tr.getTo();
-					if(cf.compartmentExists(tr.getFrom().toString())){
+					if(cf.compartmentExists(tr.getFrom())){
 						periphCmt = tr.getTo();
 						centralCmt = tr.getFrom();
 						inRate = resolver.getValue(Translator.getArgumentName(macroValue), Operand.class);
-					} else if (cf.compartmentExists(tr.getTo().toString())){
+					} else if (cf.compartmentExists(tr.getTo())){
 						periphCmt = tr.getFrom();
 						centralCmt = tr.getTo();
 						outRate = resolver.getValue(Translator.getArgumentName(macroValue), Operand.class);
@@ -88,8 +88,8 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 			}
 		}
 		
-		AbstractCompartment central = cf.getCompartment(centralCmt.toString());
-		Peripheral periph = new Peripheral(periphCmt.toString(), amount, null, null, inRate, outRate, central);
+		AbstractCompartment central = cf.getCompartment(centralCmt);
+		Peripheral periph = new Peripheral(periphCmt, amount, null, null, inRate, outRate, central);
 		cf.addCompartment(periph);
 		return periph;
 	}

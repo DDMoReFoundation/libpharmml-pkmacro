@@ -19,6 +19,7 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
@@ -35,9 +36,9 @@ class Effect extends AbstractCompartment {
 	
 //	protected VariableDefinition targetConcentration;
 	
-	private Effect(AbstractCompartment target, Operand ke0, DerivativeVariable concentration, 
+	private Effect(Integer cmt, AbstractCompartment target, Operand ke0, DerivativeVariable concentration, 
 			VariableDefinition targetConcentration){
-		super("toGenerate", null, null, new SymbolRef(concentration.getSymbId()));
+		super(cmt, null, null, new SymbolRef(concentration.getSymbId()));
 		this.ke0 = ke0;
 		this.target = target;
 		
@@ -66,8 +67,8 @@ class Effect extends AbstractCompartment {
 //				concentrationRef.getSymbIdRef());
 		DerivativeVariable concentration = resolveDerivativeVariable(vf, concentrationRef);
 		
-		String cmt = pr.getValue("cmt").getContent().toString();
-		AbstractCompartment target = cf.getCompartment(cmt);
+		Integer targetCmt = pr.getValue("cmt",IntValue.class).getValue().intValue();
+		AbstractCompartment target = cf.getCompartment(targetCmt);
 		
 		Operand ke0 = pr.getValue(EffectMacro.Arg.KE0.toString(), Operand.class);
 		
@@ -85,7 +86,7 @@ class Effect extends AbstractCompartment {
 			throw new InvalidMacroException("Symbol reference for concentration in compartment "+target.getCmt()+"is not resolved.");
 		}
 		
-		Effect effect = new Effect(target,ke0,concentration,targetConcentration);
+		Effect effect = new Effect(cf.highestCompartmentId()+1,target,ke0,concentration,targetConcentration);
 		cf.addCompartment(effect);
 		
 		return effect;

@@ -25,13 +25,13 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 class CompartmentFactory {
 	
-	private final Map<String, AbstractCompartment> map_compartments;
+	private final Map<Integer, AbstractCompartment> map_compartments;
 	
 	CompartmentFactory() {
-		map_compartments = new HashMap<String, AbstractCompartment>();
+		map_compartments = new HashMap<Integer, AbstractCompartment>();
 	}
 	
-	AbstractCompartment getCompartment(String cmt) throws InvalidMacroException{
+	AbstractCompartment getCompartment(Integer cmt) throws InvalidMacroException{
 		if(map_compartments.containsKey(cmt)){
 			return map_compartments.get(cmt);
 		} else {
@@ -52,8 +52,7 @@ class CompartmentFactory {
 	
 	Integer highestCompartmentId(){
 		Integer highest = 0;
-		for(String id : map_compartments.keySet()){
-			Integer intId = Integer.valueOf(id);
+		for(Integer intId : map_compartments.keySet()){
 			if(intId > highest){
 				highest = intId;
 			}
@@ -61,7 +60,7 @@ class CompartmentFactory {
 		return highest;
 	}
 	
-	boolean compartmentExists(String cmt){
+	boolean compartmentExists(Integer cmt){
 		return map_compartments.containsKey(cmt);
 	}
 

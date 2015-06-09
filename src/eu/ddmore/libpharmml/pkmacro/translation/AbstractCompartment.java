@@ -31,19 +31,19 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  */
 abstract class AbstractCompartment extends AbstractMacro implements EquationSource {
 
-	protected final String cmt; // transient for refering
+	protected final Integer cmt; // transient for refering
 	protected final DerivativeVariable amount;
 	protected final Operand volume;
 	protected final Operand concentration;
 	
-	AbstractCompartment(String cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
+	AbstractCompartment(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
 		this.cmt = cmt;
 		this.amount = amount;
 		this.volume = volume;
 		this.concentration = concentration;
 	}
 
-	public String getCmt() {
+	public Integer getCmt() {
 		return cmt;
 	}
 

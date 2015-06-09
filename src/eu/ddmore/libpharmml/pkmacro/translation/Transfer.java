@@ -18,6 +18,7 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
@@ -64,8 +65,8 @@ class Transfer extends AbstractMacro implements CompartmentTargeter{
 	static Transfer fromMacro(CompartmentFactory cf, VariableFactory vf, TransferMacro macro) throws InvalidMacroException {
 		ParamResolver pr = new ParamResolver(macro);
 		
-		AbstractCompartment from = cf.getCompartment(pr.getValue("from").getContent().toString());
-		AbstractCompartment to = cf.getCompartment(pr.getValue("to").getContent().toString());
+		AbstractCompartment from = cf.getCompartment(pr.getValue("from",IntValue.class).getValue().intValue());
+		AbstractCompartment to = cf.getCompartment(pr.getValue("to",IntValue.class).getValue().intValue());
 		Operand rate = pr.getValue(TransferMacro.Arg.KT, Operand.class);
 		
 		return new Transfer(from, to, rate);

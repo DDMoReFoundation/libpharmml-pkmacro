@@ -55,11 +55,11 @@ class Depot extends AbstractMacro implements InputSource {
 			ka = pr.getValue(DepotMacro.Arg.KA, Operand.class);
 			// Depot with ka equals to compartment and oral macros
 			getLogger().info("Depot macro translated to 1 Compartment and 1 Oral");
-			Compartment comp = new Compartment(String.valueOf(cf.highestCompartmentId()+1), target, null, null);
+			Compartment comp = new Compartment(cf.highestCompartmentId()+1, target, null, null);
 			cf.addCompartment(comp);
 			cf.addCompartment(new Absorption(
 					adm, null, null, ka, null, null, null, comp, Absorption.Type.FIRST_ORDER, 
-					String.valueOf(cf.highestCompartmentId()+1), target, vf));
+					cf.highestCompartmentId()+1, target, vf));
 		} else {
 			ka = null;
 		}

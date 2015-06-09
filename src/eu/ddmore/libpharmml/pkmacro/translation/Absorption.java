@@ -60,7 +60,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	protected VariableDefinition lastDoseAmountToAd = null;
 		
 	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, Operand p,
-			AbstractCompartment target, Type type, String cmt, DerivativeVariable amount, VariableFactory vf) {
+			AbstractCompartment target, Type type, Integer cmt, DerivativeVariable amount, VariableFactory vf) {
 		super(cmt, amount, null, null);
 		this.adm = adm;
 		Tlag = tlag;
@@ -117,7 +117,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		}
 		
 		AbstractCompartment target = cf.getCompartment(
-				pr.getValue(AbsorptionOralMacro.Arg.CMT).getContent().toString());
+				pr.getValue("cmt",IntValue.class).getValue().intValue());
 		
 		Integer cmt = cf.highestCompartmentId()+1;
 		
@@ -139,7 +139,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		
 		
 		Absorption abs = new Absorption(adm, Tlag, Tk0, ka, Ktr, Mtt, p, target,
-				type, cmt.toString(), amount, vf);
+				type, cmt, amount, vf);
 		cf.addCompartment(abs);
 		return abs;
 	}

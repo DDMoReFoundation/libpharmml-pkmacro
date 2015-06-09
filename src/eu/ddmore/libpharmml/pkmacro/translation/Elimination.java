@@ -19,6 +19,7 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
@@ -62,7 +63,7 @@ class Elimination extends AbstractMacro implements CompartmentTargeter {
 	static Elimination fromMacro(CompartmentFactory cf, VariableFactory vf, EliminationMacro macro) throws InvalidMacroException{
 		ParamResolver resolver = new ParamResolver(macro);
 		
-		AbstractCompartment target = cf.getCompartment(resolver.getValue("cmt").getContent().toString());
+		AbstractCompartment target = cf.getCompartment(resolver.getValue("cmt",IntValue.class).getValue().intValue());
 		
 		if(resolver.contains("k")){
 			return createLinear(target,resolver.getValue("k",Operand.class));
