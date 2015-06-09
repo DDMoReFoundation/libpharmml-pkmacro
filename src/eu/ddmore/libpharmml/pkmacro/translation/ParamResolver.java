@@ -62,6 +62,15 @@ class ParamResolver {
 		return data.get(argument);
 	}
 	
+	/**
+	 * Gets the value corresponding to the provided argument, assuming that the value has
+	 * the specified type.
+	 * @param argument Name of the argument.
+	 * @param clazz The expected type of the parameter.
+	 * @return The value casted to the given T type.
+	 * @throws InvalidMacroException If the parameter does not have the given type. Or if the
+	 * parameter does not exist.
+	 */
 	@SuppressWarnings("unchecked")
 	<T> T getValue(String argument, Class<T> clazz) throws InvalidMacroException{
 		Rhs rhs_value = getValue(argument);
