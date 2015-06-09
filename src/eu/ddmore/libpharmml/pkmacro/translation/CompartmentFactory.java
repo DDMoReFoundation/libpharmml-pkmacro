@@ -50,6 +50,17 @@ class CompartmentFactory {
 		return map_compartments.size();
 	}
 	
+	Integer highestCompartmentId(){
+		Integer highest = 0;
+		for(String id : map_compartments.keySet()){
+			Integer intId = Integer.valueOf(id);
+			if(intId > highest){
+				highest = intId;
+			}
+		}
+		return highest;
+	}
+	
 	boolean compartmentExists(String cmt){
 		return map_compartments.containsKey(cmt);
 	}
