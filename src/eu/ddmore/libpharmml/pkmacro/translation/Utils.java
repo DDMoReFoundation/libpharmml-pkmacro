@@ -18,6 +18,7 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Rhs;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
@@ -25,9 +26,13 @@ import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
+import eu.ddmore.libpharmml.dom.maths.Condition;
 import eu.ddmore.libpharmml.dom.maths.Equation;
 import eu.ddmore.libpharmml.dom.maths.ExpressionValue;
+import eu.ddmore.libpharmml.dom.maths.LogicBinOp;
 import eu.ddmore.libpharmml.dom.maths.Operand;
+import eu.ddmore.libpharmml.dom.maths.Piece;
+import eu.ddmore.libpharmml.dom.maths.Piecewise;
 import eu.ddmore.libpharmml.dom.maths.Uniop;
 import eu.ddmore.libpharmml.dom.maths.Unioperator;
 
@@ -101,7 +106,35 @@ public class Utils {
 			} else if (v.getAssign().getEquation().getUniop() != null){
 				sb.append(v.getAssign().getEquation().getUniop());
 			} else if (v.getAssign().getEquation().getPiecewise() != null){
-				sb.append(v.getAssign().getEquation().getPiecewise());
+				sb.append(piecewiseToString(v.getAssign().getEquation().getPiecewise()));
+			}
+		}
+		return sb.toString();
+	}
+	
+	public static String objectToString(Object o){
+		if(o instanceof CommonVariableDefinition){
+			return ((CommonVariableDefinition) o).getSymbId();
+		} else {
+			return String.valueOf(o);
+		}
+	}
+	
+	public static String piecewiseToString(Piecewise pw){
+		StringBuilder sb = new StringBuilder();
+		for(Piece p : pw.getPiece()){
+			Condition condition = p.getCondition();
+			if(condition.getOtherwise() == null){
+				String conditionString;
+				if(condition.getLogicBinop() != null){
+					LogicBinOp lb = condition.getLogicBinop();
+					conditionString = objectToString(lb.getContent().get(0).getValue())+" "+lb.getOp()+" "+lb.getContent().get(1).getValue();
+				} else {
+					conditionString = null;
+				}
+				sb.append("if ("+conditionString+") { "+p.getValue()+" } else ");
+			} else {
+				sb.append("{ "+p.getValue()+" }");
 			}
 		}
 		return sb.toString();
