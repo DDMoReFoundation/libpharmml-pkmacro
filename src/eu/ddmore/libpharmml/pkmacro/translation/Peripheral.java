@@ -46,10 +46,6 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 	static Peripheral fromMacro(CompartmentFactory cf, VariableFactory vf, PeripheralMacro macro) throws InvalidMacroException{
 		ParamResolver resolver = new ParamResolver(macro);
 		
-		SymbolRef amountRef = resolver.getValue("amount", SymbolRef.class);
-		DerivativeVariable amount = resolveDerivativeVariable(vf, amountRef);
-//		this.amount = s.getSymbIdRef();
-		
 		// Looking for transfer rates
 		Integer periphCmt = null;
 		Integer centralCmt = null;
@@ -86,6 +82,15 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 					}
 				}
 			}
+		}
+		
+		// amount, not required since 0.1.1
+		DerivativeVariable amount;
+		if(resolver.contains(PeripheralMacro.Arg.AMOUNT)){
+			SymbolRef amountRef = resolver.getValue("amount", SymbolRef.class);
+			amount = resolveDerivativeVariable(vf, amountRef);
+		} else {
+			amount = vf.createDerivativeVariable(VariableFactory.PERIPH_CMT_PREFIX, periphCmt);
 		}
 		
 		AbstractCompartment central = cf.getCompartment(centralCmt);
