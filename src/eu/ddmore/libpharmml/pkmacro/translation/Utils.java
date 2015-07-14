@@ -89,9 +89,9 @@ public class Utils {
 		sb.append("d"+dv.getSymbId()+"/dt = ");
 		if(dv.getAssign() != null && dv.getAssign().getEquation() != null){
 			if(dv.getAssign().getEquation().getBinop() != null){
-				sb.append(dv.getAssign().getEquation().getBinop());
+				sb.append(binopToString(dv.getAssign().getEquation().getBinop()));
 			} else if (dv.getAssign().getEquation().getUniop() != null){
-				sb.append(dv.getAssign().getEquation().getUniop());
+				sb.append(uniopToString(dv.getAssign().getEquation().getUniop()));
 			}
 		}
 		return sb.toString();
@@ -102,9 +102,9 @@ public class Utils {
 		sb.append(v.getSymbId()+" = ");
 		if(v.getAssign() != null && v.getAssign().getEquation() != null){
 			if(v.getAssign().getEquation().getBinop() != null){
-				sb.append(v.getAssign().getEquation().getBinop());
+				sb.append(binopToString(v.getAssign().getEquation().getBinop()));
 			} else if (v.getAssign().getEquation().getUniop() != null){
-				sb.append(v.getAssign().getEquation().getUniop());
+				sb.append(uniopToString(v.getAssign().getEquation().getUniop()));
 			} else if (v.getAssign().getEquation().getPiecewise() != null){
 				sb.append(piecewiseToString(v.getAssign().getEquation().getPiecewise()));
 			}
@@ -112,9 +112,111 @@ public class Utils {
 		return sb.toString();
 	}
 	
+	public static String binopToString(Binop binop){
+		StringBuilder sb = new StringBuilder();
+		Operand op1 = binop.getOperand1();
+		Operand op2 = binop.getOperand2();
+		
+		String operand1String = operandToString(op1);
+		String operand2String = operandToString(op2);
+		Binoperator operator = binop.getOperator();
+		
+		String string;
+		switch (operator) {
+			case ATAN2:
+				string = "atan2( "+operand1String+" , "+operand2String+" )";
+				break;
+			case DIVIDE:
+				string = operand1String+" / "+operand2String;
+				break;
+			case LOGX:
+				string = operand1String+"log "+operand2String;
+				break;
+			case MAX:
+				string = "max{ "+operand1String+" , "+operand2String+" }";
+				break;
+			case MIN:
+				string = "min{ "+operand1String+" , "+operand2String+" }";
+				break;
+			case MINUS:
+				string = operand1String+" - "+operand2String;
+				break;
+			case PLUS:
+				string = operand1String+" + "+operand2String;
+				break;
+			case POWER:
+				string = operand1String+" ^ "+operand2String;
+				break;
+			case REM:
+				string = operand1String+" % "+operand2String;
+				break;
+			case ROOT:
+				string = operand2String+"root( "+operand1String+" )";
+				break;
+			case TIMES:
+				string = operand1String+" x "+operand2String;
+				break;
+			default:
+				string = "" + operand1String + operator + operand2String;
+				break;
+		}
+		
+		sb.append(string);
+		
+		return sb.toString();
+	}
+	
+	public static String uniopToString(Uniop uniop){
+		StringBuilder sb = new StringBuilder();
+		
+		ExpressionValue content = uniop.getValue();
+		Unioperator operator = uniop.getOperator();
+		
+		switch (operator){
+		case MINUS:
+			sb.append("- "+expressionValueToString(content));
+			break;
+		default:
+			sb.append(operator+"("+expressionValueToString(content)+")");
+			break;
+			
+		}
+		return sb.toString();
+	}
+	
+	public static String operandToString(Operand op){
+		StringBuilder sb = new StringBuilder();
+		if(op instanceof SymbolRef){
+			SymbolRef sref = (SymbolRef) op;
+			if(sref.getBlkIdRef() != null){
+				sb.append("["+sref.getBlkIdRef()+"]");
+			}
+			sb.append(sref.getSymbIdRef());
+		} else if(op instanceof Scalar){
+			sb.append(((Scalar) op).valueToString());
+		} else if(op instanceof Binop){
+			sb.append(binopToString((Binop) op));
+		} else if(op instanceof Uniop){
+			sb.append(uniopToString((Uniop) op));
+		} else {
+			sb.append("Unknown operand");
+		}
+		return sb.toString();
+	}
+	
+	public static String expressionValueToString(ExpressionValue ev){
+		if(ev instanceof Operand){
+			return operandToString((Operand) ev);
+		} else {
+			return "ERROR";
+		}
+	}
+	
 	public static String objectToString(Object o){
 		if(o instanceof CommonVariableDefinition){
 			return ((CommonVariableDefinition) o).getSymbId();
+		} else if (o instanceof Scalar){
+			return ((Scalar) o).valueToString();
 		} else {
 			return String.valueOf(o);
 		}
@@ -128,13 +230,13 @@ public class Utils {
 				String conditionString;
 				if(condition.getLogicBinop() != null){
 					LogicBinOp lb = condition.getLogicBinop();
-					conditionString = objectToString(lb.getContent().get(0).getValue())+" "+lb.getOp()+" "+lb.getContent().get(1).getValue();
+					conditionString = objectToString(lb.getContent().get(0).getValue())+" "+lb.getOp()+" "+objectToString(lb.getContent().get(1).getValue());
 				} else {
 					conditionString = null;
 				}
-				sb.append("if ("+conditionString+") { "+p.getValue()+" } else ");
+				sb.append("if ("+conditionString+") { "+expressionValueToString(p.getValue())+" } else ");
 			} else {
-				sb.append("{ "+p.getValue()+" }");
+				sb.append("{ "+expressionValueToString(p.getValue())+" }");
 			}
 		}
 		return sb.toString();
