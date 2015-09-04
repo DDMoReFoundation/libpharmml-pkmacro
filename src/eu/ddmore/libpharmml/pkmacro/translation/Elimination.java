@@ -18,6 +18,10 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.Collections;
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
@@ -137,6 +141,11 @@ class Elimination extends AbstractMacro implements CompartmentTargeter {
 				break;
 		}
 		Utils.addOperand(targetVar, Binoperator.MINUS, math_el);
+	}
+
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return Collections.emptyList();
 	}
 	
 }

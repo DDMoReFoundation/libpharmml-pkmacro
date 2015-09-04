@@ -18,9 +18,40 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
+import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
+
 /**
  * Root class of any translated macro.
  */
 public abstract class AbstractMacro {
+	
+	private int index = -1;
+	
+	/**
+	 * Position of the macro as it is read in the input PharmML model.
+	 * @return The index starting from 0. Returns -1 if the order has not been saved.
+	 */
+	public int getIndex(){
+		return index;
+	}
+	
+	/**
+	 * Sets the position of the input xml macro to keep track of it.
+	 * @param index The current position of the untranslated macro.
+	 */
+	void setIndex(int index){
+		this.index = index;
+	}
+	
+	/**
+	 * Gets the {@link VariableDefinition} and {@link DerivativeVariable} objects created by this
+	 * macro.
+	 * @return A {@link List} of variables.
+	 */
+	abstract List<CommonVariableDefinition> getVariables();
 
 }

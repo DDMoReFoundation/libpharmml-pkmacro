@@ -18,12 +18,16 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.impl.LoggerWrapper;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
+import eu.ddmore.libpharmml.util.ChainedList;
 
 /**
  * Every new macro extending this class means adding a new {@link DerivativeVariable} definition
@@ -59,6 +63,15 @@ abstract class AbstractCompartment extends AbstractMacro implements EquationSour
 		return concentration;
 	}
 
+	/**
+	 * Tries to find an already defined {@link DerivativeVariable} within the variable factory. If
+	 * the variable exists as a {@link VariableDefinition}, this one is transformed to a {@link DerivativeVariable}.
+	 * If the variable doesn't exist at all, a new {@link DerivativeVariable} is created.
+	 * @param vf {@link VariableFactory} used during this translation process.
+	 * @param sref {@link SymbolRef} that refers to the wanted derivative variable.
+	 * @return The referred {@link DerivativeVariable} that was found or created.
+	 * @throws InvalidMacroException If the provided {@link SymbolRef} doesn't have a valid symbIdRef.
+	 */
 	protected static DerivativeVariable resolveDerivativeVariable(VariableFactory vf, SymbolRef sref) throws InvalidMacroException{
 		String symbId = sref.getSymbIdRef();
 		DerivativeVariable dv;
@@ -73,6 +86,7 @@ abstract class AbstractCompartment extends AbstractMacro implements EquationSour
 					LoggerWrapper.getLogger().info("Variable "+symbId+" transformed to DerivativeVariable.");
 					dv = vf.transformToDerivativeVariable(var);
 				} else {
+					LoggerWrapper.getLogger().info("New derivative variable \""+symbId+"\".");
 					dv = vf.generateDerivativeVariable(symbId);
 				}				
 			}
@@ -93,6 +107,11 @@ abstract class AbstractCompartment extends AbstractMacro implements EquationSour
 			}
 		}
 		return v;
+	}
+	
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return new ChainedList<CommonVariableDefinition>().addIfNotNull(amount);
 	}
 		
 }

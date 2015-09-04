@@ -18,6 +18,9 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
@@ -28,6 +31,7 @@ import eu.ddmore.libpharmml.dom.maths.Equation;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.EffectMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
+import eu.ddmore.libpharmml.util.ChainedList;
 
 class Effect extends AbstractCompartment {
 	
@@ -98,6 +102,11 @@ class Effect extends AbstractCompartment {
 
 	public Operand getConcentration() {
 		return concentration;
+	}
+
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return new ChainedList<CommonVariableDefinition>().addIfNotNull(amount);
 	}
 	
 //	@Override

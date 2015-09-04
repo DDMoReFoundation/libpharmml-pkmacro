@@ -19,7 +19,9 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
@@ -50,9 +52,27 @@ public class Translator {
 	
 //	private final VariableFactory variableFactory;
 	
+	private final Map<String, Boolean> parameters;
+	
+	/**
+	 * Parameter for keeping the order of the input PK macros. The output ODEs that symbolise 
+	 * compartments appear in the same order as the macros one. Default value: false.
+	 */
+	public final static String KEEP_ORDER = "translator.keeporder";
 	
 	public Translator(){
-
+		parameters = new HashMap<String, Boolean>();
+		parameters.put(KEEP_ORDER, false);
+	}
+	
+	/**
+	 * Change the settings of the translation. The only parameter available at the moment
+	 * is {@link #KEEP_ORDER}, with default value "false".
+	 * @param parameter The name of the parameter, that must be in the static fields of {@link Translator}.
+	 * @param value The new value the parameter.
+	 */
+	public void setParameter(String parameter, Boolean value){
+		parameters.put(parameter, value);
 	}
 	
 	/**
@@ -65,34 +85,52 @@ public class Translator {
 		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
 		
 		// Core macros
-		for(PKMacro xmlMacro : list.getListOfMacro()){
+		for(int i = 0;i<list.getListOfMacro().size();i++){
+			PKMacro xmlMacro = list.getListOfMacro().get(i);
 			if(xmlMacro instanceof CompartmentMacro){
-				model.add(Compartment.fromMacro(cf, vf, (CompartmentMacro) xmlMacro));
+				Compartment macro = Compartment.fromMacro(cf, vf, (CompartmentMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 			else if(xmlMacro instanceof PeripheralMacro){
-				model.add(Peripheral.fromMacro(cf, vf, (PeripheralMacro) xmlMacro));
+				Peripheral macro = Peripheral.fromMacro(cf, vf, (PeripheralMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 		}
 		
 		// Targetted macros
-		for(PKMacro xmlMacro : list.getListOfMacro()){
+		for(int i = 0;i<list.getListOfMacro().size();i++){
+			PKMacro xmlMacro = list.getListOfMacro().get(i);
 			if(xmlMacro instanceof AbsorptionOralMacro){
-				model.add(Absorption.fromMacro(cf, vf, (AbsorptionOralMacro) xmlMacro));
+				Absorption macro = Absorption.fromMacro(cf, vf, (AbsorptionOralMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 			else if(xmlMacro instanceof IVMacro){
-				model.add(IV.fromMacro(cf, vf, (IVMacro) xmlMacro));
+				IV macro = IV.fromMacro(cf, vf, (IVMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 			else if(xmlMacro instanceof TransferMacro){
-				model.add(Transfer.fromMacro(cf, vf, (TransferMacro) xmlMacro));
+				Transfer macro = Transfer.fromMacro(cf, vf, (TransferMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 			else if(xmlMacro instanceof EliminationMacro){
-				model.add(Elimination.fromMacro(cf, vf, (EliminationMacro) xmlMacro));
+				Elimination macro = Elimination.fromMacro(cf, vf, (EliminationMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 			else if(xmlMacro instanceof EffectMacro){
-				model.add(Effect.fromMacro(cf, vf, (EffectMacro) xmlMacro));
+				Effect macro = Effect.fromMacro(cf, vf, (EffectMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 			else if(xmlMacro instanceof DepotMacro){
-				model.add(Depot.fromMacro(cf, vf, (DepotMacro) xmlMacro));
+				Depot macro = Depot.fromMacro(cf, vf, (DepotMacro) xmlMacro);
+				macro.setIndex(i);
+				model.add(macro);
 			}
 		}
 		
@@ -111,7 +149,6 @@ public class Translator {
 //		return map_compartments.get(cmt);
 //	}
 	
-	
 	static String getArgumentName(MacroValue value){
 		if(value.getArgument() != null){
 			return value.getArgument();
@@ -120,6 +157,17 @@ public class Translator {
 		} else {
 			return null;
 		}
+	}
+	
+	private static List<AbstractMacro> sortByIndex(List<AbstractMacro> unsorted){
+		List<AbstractMacro> sorted = new ArrayList<AbstractMacro>(unsorted.size());
+		while(sorted.size() < unsorted.size()){
+			sorted.add(null);
+		}
+		for(AbstractMacro macro : unsorted){
+			sorted.set(macro.getIndex(), macro);
+		}
+		return sorted;
 	}
 	
 	/**
@@ -152,7 +200,31 @@ public class Translator {
 			}
 		}
 		
-		for(CommonVariableDefinition var : vf.getDefinedVariables()){
+		List<CommonVariableDefinition> variables;
+		if(parameters.get(KEEP_ORDER)){
+			List<AbstractMacro> sorted = sortByIndex(model);
+			variables = new ArrayList<CommonVariableDefinition>();
+
+			for(AbstractMacro macro : sorted){
+				variables.addAll(macro.getVariables());
+			}
+			
+			for(CommonVariableDefinition variable : vf.getDefinedVariables()){
+				if(!variables.contains(variable)){
+					variables.add(0, variable);
+				}
+			}
+			
+			// checking
+			if(vf.getDefinedVariables().size() != variables.size()){
+				throw new RuntimeException("Missing variables after sorting.");
+			}
+			
+		} else {
+			variables = vf.getDefinedVariables();
+		}
+		
+		for(CommonVariableDefinition var : variables){
 			if(var instanceof DerivativeVariable){
 				translated_sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createDerivativeVariable(
 						(DerivativeVariable) var));

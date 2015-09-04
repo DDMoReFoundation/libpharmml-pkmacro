@@ -18,6 +18,10 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.Collections;
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.IVMacro;
@@ -52,6 +56,11 @@ class IV extends AbstractMacro implements InputSource {
 	@Override
 	public void generateInputs(InputList inputList) {		
 		inputList.createInput(InputType.IV, adm, target.getAmount());
+	}
+
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return Collections.emptyList();
 	}
 
 }

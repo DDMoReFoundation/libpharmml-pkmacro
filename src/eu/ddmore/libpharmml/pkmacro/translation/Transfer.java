@@ -18,6 +18,10 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.Collections;
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.maths.Binop;
@@ -70,6 +74,11 @@ class Transfer extends AbstractMacro implements CompartmentTargeter{
 		Operand rate = pr.getValue(TransferMacro.Arg.KT, Operand.class);
 		
 		return new Transfer(from, to, rate);
+	}
+
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return Collections.emptyList();
 	}
 
 }

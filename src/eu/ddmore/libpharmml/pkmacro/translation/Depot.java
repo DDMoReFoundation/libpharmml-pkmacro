@@ -19,12 +19,17 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import static eu.ddmore.libpharmml.impl.LoggerWrapper.getLogger;
+
+import java.util.List;
+
+import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.DepotMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
+import eu.ddmore.libpharmml.util.ChainedList;
 
 class Depot extends AbstractMacro implements InputSource {
 	
@@ -75,6 +80,11 @@ class Depot extends AbstractMacro implements InputSource {
 		} else {
 			inputList.createInput(InputType.IV, adm, target);
 		}
+	}
+
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return new ChainedList<CommonVariableDefinition>().addIfNotNull(target);
 	}
 	
 	

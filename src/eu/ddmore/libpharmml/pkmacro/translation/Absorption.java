@@ -18,6 +18,8 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.List;
+
 import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
@@ -39,6 +41,7 @@ import eu.ddmore.libpharmml.dom.maths.Uniop;
 import eu.ddmore.libpharmml.dom.maths.Unioperator;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.AbsorptionOralMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
+import eu.ddmore.libpharmml.util.ChainedList;
 
 class Absorption extends AbstractCompartment implements CompartmentTargeter, InputSource {
 
@@ -303,6 +306,14 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	@Override
 	public void generateInputs(InputList inputList) throws InvalidMacroException {
 		inputList.createInput(InputType.ORAL, adm, inputTarget, Tlag, p);
+	}
+
+	@Override
+	List<CommonVariableDefinition> getVariables() {
+		return new ChainedList<CommonVariableDefinition>()
+				.addIfNotNull(amount)
+				.addIfNotNull(zeroOrderRate)
+				.addIfNotNull(lastDoseAmountToAd);
 	}
 	
 }
