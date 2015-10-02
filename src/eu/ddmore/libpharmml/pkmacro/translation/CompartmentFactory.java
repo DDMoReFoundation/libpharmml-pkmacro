@@ -18,8 +18,10 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
@@ -58,6 +60,16 @@ class CompartmentFactory {
 			}
 		}
 		return highest;
+	}
+	
+	Integer lowestAvailableId(){
+		Set<Integer> keys = map_compartments.keySet();
+		for(Integer i = 1;i<1000;i++){
+			if(!keys.contains(i)){
+				return i;
+			}
+		}
+		return null;
 	}
 	
 	boolean compartmentExists(Integer cmt){
