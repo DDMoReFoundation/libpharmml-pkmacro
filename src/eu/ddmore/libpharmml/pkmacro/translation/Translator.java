@@ -62,7 +62,7 @@ public class Translator {
 	
 	public Translator(){
 		parameters = new HashMap<String, Boolean>();
-		parameters.put(KEEP_ORDER, false);
+		parameters.put(KEEP_ORDER, true);
 	}
 	
 	/**

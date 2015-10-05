@@ -64,7 +64,7 @@ class CompartmentFactory {
 	
 	Integer lowestAvailableId(){
 		Set<Integer> keys = map_compartments.keySet();
-		for(Integer i = 1;i<1000;i++){
+		for(Integer i = 1;i<10000;i++){ // a safe limit
 			if(!keys.contains(i)){
 				return i;
 			}

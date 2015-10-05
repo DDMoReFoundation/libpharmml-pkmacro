@@ -75,18 +75,19 @@ class ParamResolver {
 	@SuppressWarnings("unchecked")
 	<T> T getValue(String argument, Class<T> clazz) throws InvalidMacroException{
 		Rhs rhs_value = getValue(argument);
-		if(rhs_value.getContent() instanceof Equation){
+		Object rhs_content = rhs_value.getContent();
+		if(rhs_content instanceof Equation){
 			Equation eq = (Equation) rhs_value.getContent();
 			Object content = getEquationContent(eq);
 			if(clazz.isInstance(content)){
 				return (T) content;
 			} else {
-				throw new InvalidMacroException(argument + " must be defined as a "+ clazz +".");
+				throw new InvalidMacroException(argument + " must be defined as a "+ clazz +" object. Actual is "+content.getClass());
 			}
-		} else if(clazz.isInstance(rhs_value.getContent())){
+		} else if(clazz.isInstance(rhs_content)){
 			return (T) rhs_value.getContent();
 		} else {
-			throw new InvalidMacroException(argument + " must be defined as a "+ clazz +".");
+			throw new InvalidMacroException(argument + " must be defined as a"+ clazz +" object. Actual is "+rhs_content);
 		}
 	}
 	

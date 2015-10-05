@@ -122,7 +122,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		AbstractCompartment target = cf.getCompartment(
 				pr.getValue("cmt",IntValue.class).getValue().intValue());
 		
-		Integer cmt = cf.highestCompartmentId()+1;
+		Integer cmt = cf.lowestAvailableId();
 		
 		Type type = null;
 		DerivativeVariable amount;

@@ -90,7 +90,7 @@ class Effect extends AbstractCompartment {
 			throw new InvalidMacroException("Symbol reference for concentration in compartment "+target.getCmt()+"is not resolved.");
 		}
 		
-		Effect effect = new Effect(cf.highestCompartmentId()+1,target,ke0,concentration,targetConcentration);
+		Effect effect = new Effect(cf.lowestAvailableId(),target,ke0,concentration,targetConcentration);
 		cf.addCompartment(effect);
 		
 		return effect;
