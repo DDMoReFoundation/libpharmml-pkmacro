@@ -27,7 +27,6 @@ import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Condition;
-import eu.ddmore.libpharmml.dom.maths.Equation;
 import eu.ddmore.libpharmml.dom.maths.ExpressionValue;
 import eu.ddmore.libpharmml.dom.maths.LogicBinOp;
 import eu.ddmore.libpharmml.dom.maths.Operand;
@@ -40,58 +39,55 @@ public class Utils {
 	
 	static void addOperand(DerivativeVariable var, Binoperator op, Operand operand){
 		Rhs rhs = var.getAssign();
-		if(rhs == null || rhs.getEquation() == null){
-			rhs = var.assign(new Equation());
+		if(rhs == null){
+			rhs = new Rhs();
+			var.setAssign(rhs);
 		}
-		Equation eq = rhs.getEquation();
-		Operand content = getContent(eq);
+		Operand content = getContent(rhs);
 		if(content == null){
 			if(op.equals(Binoperator.MINUS) && operand instanceof ExpressionValue){
 				Uniop uniop = new Uniop(Unioperator.MINUS, (ExpressionValue) operand);
-				eq.setUniop(uniop);
+				rhs.setUniop(uniop);
 			} else if(op.equals(Binoperator.PLUS)) {
 				if(operand instanceof SymbolRef){
-					eq.setSymbRef((SymbolRef) operand);
+					rhs.setSymbRef((SymbolRef) operand);
 				} else if(operand instanceof Binop){
-					eq.setBinop((Binop) operand);
+					rhs.setBinop((Binop) operand);
 				} else if(operand instanceof Scalar){
-					eq.setScalar(operand.toJAXBElement());
+					rhs.setScalar((Scalar) operand);
 				} else if(operand instanceof Uniop){
-					eq.setUniop((Uniop) operand);
+					rhs.setUniop((Uniop) operand);
 				} else {
 					throw new RuntimeException("Unsupported operation.");
 				}
 			}
 		} else {
 			Binop newBinop = new Binop(op, content, operand);
-			rhs.getEquation().setBinop(newBinop);
+			rhs.setBinop(newBinop);
 		}
 	}
 	
-	private static Operand getContent(Equation eq){
-		Operand content;
-		if(eq.getBinop() != null){
-			content = eq.getBinop();
-		} else if(eq.getUniop() != null){
-			content = eq.getUniop();
-		} else if(eq.getSymbRef() != null){
-			content = eq.getSymbRef();
-		} else if(eq.getScalar() != null && eq.getScalar().getValue() instanceof Scalar){
-			content = (Scalar) eq.getScalar().getValue();
+	private static Operand getContent(Rhs rhs){
+		Object content = rhs.getContent();
+		if(content instanceof Operand){
+			return (Operand) content;
+		} else if (content == null) {
+			return null;
 		} else {
-			content = null;
+			throw new RuntimeException("Unsupported operation on non operand object ("+content+")");
 		}
-		return content;
 	}
 	
 	public static String variableToString(DerivativeVariable dv){
 		StringBuilder sb = new StringBuilder();
 		sb.append("d"+dv.getSymbId()+"/dt = ");
-		if(dv.getAssign() != null && dv.getAssign().getEquation() != null){
-			if(dv.getAssign().getEquation().getBinop() != null){
-				sb.append(binopToString(dv.getAssign().getEquation().getBinop()));
-			} else if (dv.getAssign().getEquation().getUniop() != null){
-				sb.append(uniopToString(dv.getAssign().getEquation().getUniop()));
+		if(dv.getAssign() != null){
+			if(dv.getAssign().getBinop() != null){
+				sb.append(binopToString(dv.getAssign().getBinop()));
+			} else if (dv.getAssign().getUniop() != null){
+				sb.append(uniopToString(dv.getAssign().getUniop()));
+			} else {
+				sb.append(dv.getAssign().getContent());
 			}
 		}
 		return sb.toString();
@@ -100,13 +96,15 @@ public class Utils {
 	public static String variableToString(VariableDefinition v){
 		StringBuilder sb = new StringBuilder();
 		sb.append(v.getSymbId()+" = ");
-		if(v.getAssign() != null && v.getAssign().getEquation() != null){
-			if(v.getAssign().getEquation().getBinop() != null){
-				sb.append(binopToString(v.getAssign().getEquation().getBinop()));
-			} else if (v.getAssign().getEquation().getUniop() != null){
-				sb.append(uniopToString(v.getAssign().getEquation().getUniop()));
-			} else if (v.getAssign().getEquation().getPiecewise() != null){
-				sb.append(piecewiseToString(v.getAssign().getEquation().getPiecewise()));
+		if(v.getAssign() != null){
+			if(v.getAssign().getBinop() != null){
+				sb.append(binopToString(v.getAssign().getBinop()));
+			} else if (v.getAssign().getUniop() != null){
+				sb.append(uniopToString(v.getAssign().getUniop()));
+			} else if (v.getAssign().getPiecewise() != null){
+				sb.append(piecewiseToString(v.getAssign().getPiecewise()));
+			} else {
+				sb.append(v.getAssign().getContent());
 			}
 		}
 		return sb.toString();

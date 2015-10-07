@@ -27,6 +27,9 @@ import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
+import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
+import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
+import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.AbsorptionOralMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.CompartmentMacro;
@@ -39,6 +42,7 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacroList;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PeripheralMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.TransferMacro;
+import eu.ddmore.libpharmml.impl.PharmMLVersion;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 /**
@@ -46,6 +50,7 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * @author F. Yvon
  *
  */
+@SuppressWarnings("deprecation")
 public class Translator {
 		
 //	private final List<AbstractMacro> model;
@@ -53,7 +58,7 @@ public class Translator {
 //	private final VariableFactory variableFactory;
 	
 	private final Map<String, Boolean> parameters;
-	
+		
 	/**
 	 * Parameter for keeping the order of the input PK macros. The output ODEs that symbolise 
 	 * compartments appear in the same order as the macros one. Default value: false.
@@ -175,11 +180,12 @@ public class Translator {
 	 * listed within a transient translated structural model available through the generated {@link MacroOutput}
 	 * implementation.
 	 * @param sm The structural model that contains PK macros to be translated.
+	 * @param version The wanted PharmML version of the output.
 	 * @return A {@link MacroOutput} implementation.
 	 * @throws InvalidMacroException If the translation is not possible because of any invalid
 	 * macro within the model.
 	 */
-	public MacroOutput translate(StructuralModel sm) throws InvalidMacroException{
+	public MacroOutput translate(StructuralModel sm, PharmMLVersion version) throws InvalidMacroException{
 		
 		VariableFactory vf = new VariableFactory(sm);
 		CompartmentFactory cf = new CompartmentFactory();
@@ -233,7 +239,26 @@ public class Translator {
 						(VariableDefinition) var));
 			}
 		}
-		translated_sm.getSimpleParameter().addAll(vf.getDefinedParameters());
+		
+		for(TransientParameter tp : vf.getDefinedParameters()){
+			if(tp.containsReference()){ // the parameter was already defined, so the reference to the same object is added
+				Object ref = tp.getReference();
+				if (ref instanceof PopulationParameter){
+					translated_sm.getListOfPopulationParameter().add((PopulationParameter) ref);
+				} else if (ref instanceof IndividualParameter){
+					translated_sm.getListOfIndividualParameter().add((IndividualParameter) ref);
+				} else if (ref instanceof SimpleParameter){
+					translated_sm.getSimpleParameter().add((SimpleParameter) ref);
+				}
+			} else {
+				if(version.isEqualOrLaterThan(PharmMLVersion.V0_7_1)){
+					translated_sm.getListOfPopulationParameter().add(tp.toPopulationParameter());
+				} else {
+					translated_sm.getSimpleParameter().add(tp.toSimpleParameter());
+				}
+			}
+		}
+		
 		
 		return new MacroOutput() {
 			@Override

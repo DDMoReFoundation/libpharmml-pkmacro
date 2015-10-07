@@ -34,10 +34,13 @@ import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolType;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
+import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
+import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
+@SuppressWarnings("deprecation")
 public class VariableFactory {
 	
 	public static String DEPOT_PREFIX = "Ad";
@@ -48,18 +51,24 @@ public class VariableFactory {
 	private final Map<String, Set<Integer>> variables_count;
 	
 	private final List<CommonVariableDefinition> variables;
-	private final List<SimpleParameter> parameters;
+	private final List<TransientParameter> parameters;
 	
 	VariableFactory(StructuralModel sm) throws InvalidMacroException{
 		variables_count = new HashMap<String, Set<Integer>>();
 		variables = new ArrayList<CommonVariableDefinition>();
-		parameters = new ArrayList<SimpleParameter>();
+		parameters = new ArrayList<TransientParameter>();
 		
 		for(JAXBElement<? extends CommonVariableDefinition> v : sm.getCommonVariable()){
 			storeVariable(v.getValue());
 		}
 		for(SimpleParameter p : sm.getSimpleParameter()){
 			storeParameter(p);
+		}
+		for(PopulationParameter pp : sm.getListOfPopulationParameter()){
+			storeParameter(pp);
+		}
+		for(IndividualParameter ip : sm.getListOfIndividualParameter()){
+			storeParameter(ip);
 		}
 	}
 	
@@ -149,9 +158,8 @@ public class VariableFactory {
 		return v;
 	}
 	
-	SimpleParameter generateParameter(String prefix){
-		SimpleParameter p = new SimpleParameter();
-		p.setSymbId(generateVariableName(prefix));
+	TransientParameter generateParameter(String prefix){
+		TransientParameter p = new TransientParameter(generateVariableName(prefix));
 		try {
 			storeParameter(p);
 		} catch (InvalidMacroException e) {
@@ -184,8 +192,8 @@ public class VariableFactory {
 	}
 	
 	SymbolRef createAndReferNewParameter(String name){
-		SimpleParameter param = generateParameter(name);
-		SymbolRef symbRef = new SymbolRef(param.getSymbId());
+		TransientParameter param = generateParameter(name);
+		SymbolRef symbRef = new SymbolRef(param.getSymbolId());
 		return symbRef;
 	}
 	
@@ -197,6 +205,24 @@ public class VariableFactory {
 	
 	void storeParameter(SimpleParameter p) throws InvalidMacroException{
 		VariableName varName = parseVariableName(p.getSymbId());
+		storeSymbol(varName.getPrefix(), varName.getIndex());
+		parameters.add(new TransientParameter(p));
+	}
+	
+	void storeParameter(PopulationParameter p) throws InvalidMacroException{
+		VariableName varName = parseVariableName(p.getSymbId());
+		storeSymbol(varName.getPrefix(), varName.getIndex());
+		parameters.add(new TransientParameter(p));
+	}
+	
+	void storeParameter(IndividualParameter p) throws InvalidMacroException{
+		VariableName varName = parseVariableName(p.getSymbId());
+		storeSymbol(varName.getPrefix(), varName.getIndex());
+		parameters.add(new TransientParameter(p));
+	}
+	
+	void storeParameter(TransientParameter p) throws InvalidMacroException{
+		VariableName varName = parseVariableName(p.getSymbolId());
 		storeSymbol(varName.getPrefix(), varName.getIndex());
 		parameters.add(p);
 	}
@@ -215,7 +241,7 @@ public class VariableFactory {
 		return this.variables;
 	}
 	
-	List<SimpleParameter> getDefinedParameters(){
+	List<TransientParameter> getDefinedParameters(){
 		return parameters;
 	}
 	

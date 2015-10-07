@@ -27,7 +27,6 @@ import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
-import eu.ddmore.libpharmml.dom.maths.Equation;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.EffectMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
@@ -47,20 +46,15 @@ class Effect extends AbstractCompartment {
 		this.target = target;
 		
 		// C = Ac/V
-//		this.targetConcentration = targetConcentration;
-		Equation eq = new Equation();
-		eq.setBinop(new Binop(Binoperator.DIVIDE, 
+		targetConcentration.assign(new Binop(Binoperator.DIVIDE, 
 				new SymbolRef(target.getAmount().getSymbId()), 
 				target.getVolume()));
-		targetConcentration.assign(eq);
 		
 		// dCe/dt = ke0*(C - Ce)
-		Equation eq2 = new Equation();
-		eq2.setBinop(new Binop(Binoperator.TIMES,
+		concentration.assign(new Binop(Binoperator.TIMES,
 				ke0,
 				new Binop(Binoperator.MINUS, new SymbolRef(targetConcentration.getSymbId()), new SymbolRef(concentration.getSymbId()))
 				));
-		concentration.assign(eq2);
 	}
 	
 	static Effect fromMacro(CompartmentFactory cf, VariableFactory vf, EffectMacro macro) throws InvalidMacroException{

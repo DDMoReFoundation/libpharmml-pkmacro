@@ -30,7 +30,6 @@ import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Condition;
-import eu.ddmore.libpharmml.dom.maths.Equation;
 import eu.ddmore.libpharmml.dom.maths.ExpressionValue;
 import eu.ddmore.libpharmml.dom.maths.LogicBinOp;
 import eu.ddmore.libpharmml.dom.maths.Operand;
@@ -177,9 +176,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		lastDoseAmountToAd = vf.createVariable("LastDoseAmountToAd", Integer.valueOf(getCmt()));
 		
 		// dAd/dt = -ZeroInputRate
-		Equation compartment_eq = new Equation();
-		compartment_eq.setUniop(new Uniop(Unioperator.MINUS, new SymbolRef(zeroOrderRate.getSymbId())));
-		amount.assign(compartment_eq);
+		amount.assign(new Uniop(Unioperator.MINUS, new SymbolRef(zeroOrderRate.getSymbId())));
 
 		// if (Ad > 0) { ZeroOrderRate = LastDoseAmountToAd / Tk0 } else { ZeroOrderRate = 0 }
 		Piecewise pw = new Piecewise();
@@ -208,21 +205,17 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		pw.getPiece().add(piece_Ad_gt_0);
 		pw.getPiece().add(piece_else);
 		
-		Equation eq = new Equation();
-		eq.setPiecewise(pw);
-		zeroOrderRate.assign(eq);
+		zeroOrderRate.assign(pw);
 		
 		inputTarget = amount;
 	}
 	
 	protected void generateFirstOrderODE(VariableFactory vf){
-		Equation eq = new Equation();
 		Uniop uniop = new Uniop();
 		uniop.setOperator(Unioperator.MINUS);
 		Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(amount.getSymbId()));
 		uniop.setValue(binop);
-		eq.setUniop(uniop);
-		amount.assign(eq);
+		amount.assign(uniop);
 		inputTarget = amount;
 	}
 	
@@ -297,9 +290,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 										ktrttDose), 
 								logn)), 
 				kaAa);
-		Equation rootEq = new Equation();
-		rootEq.setBinop(rootBinop);
-		amount.assign(rootEq);
+		amount.assign(rootBinop);
 		inputTarget = dose;
 	}
 
