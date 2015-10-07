@@ -61,6 +61,7 @@ public class TranslateExamples {
 	public void translateExample1() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE1);
 		Translator tl = new Translator();
+		tl.setParameter(Translator.KEEP_ORDER, false);
 		MacroOutput mo = tl.translate(sm);
 		
 		// test ODE
@@ -83,6 +84,7 @@ public class TranslateExamples {
 	public void translateExample12() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE12);
 		Translator tl = new Translator();
+		tl.setParameter(Translator.KEEP_ORDER, false);
 		MacroOutput mo = tl.translate(sm);
 		
 		// ODEs
@@ -117,6 +119,7 @@ public class TranslateExamples {
 	public void translateExample13() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE13);
 		Translator tl = new Translator();
+		tl.setParameter(Translator.KEEP_ORDER, false);
 		MacroOutput mo = tl.translate(sm);
 		
 		// Es
