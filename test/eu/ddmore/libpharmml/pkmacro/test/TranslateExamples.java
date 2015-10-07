@@ -61,12 +61,12 @@ public class TranslateExamples {
 	public void translateExample1() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE1);
 		Translator tl = new Translator();
-		MacroOutput mo = tl.translate(sm);
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// test ODE
 		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(1).getValue();
 		assertEquals("Ac", Ac.getSymbId());
-		Uniop uniop = Ac.getAssign().getEquation().getUniop();
+		Uniop uniop = Ac.getAssign().getUniop();
 		assertEquals(Unioperator.MINUS, uniop.getOperator());
 		Binop binop = (Binop) uniop.getValue();
 		assertEquals(Binoperator.TIMES, binop.getOperator());
@@ -83,7 +83,7 @@ public class TranslateExamples {
 	public void translateExample12() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE12);
 		Translator tl = new Translator();
-		MacroOutput mo = tl.translate(sm);
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// ODEs
 		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(1).getValue();
@@ -117,7 +117,8 @@ public class TranslateExamples {
 	public void translateExample13() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE13);
 		Translator tl = new Translator();
-		MacroOutput mo = tl.translate(sm);
+		tl.setParameter(Translator.KEEP_ORDER, false);
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// Es
 		VariableDefinition C1 = (VariableDefinition) mo.getStructuralModel().getCommonVariable().get(0).getValue();
