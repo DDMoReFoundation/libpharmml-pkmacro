@@ -251,7 +251,7 @@ public class Translator {
 					translated_sm.getSimpleParameter().add((SimpleParameter) ref);
 				}
 			} else {
-				if(version.isEqualOrLaterThan(PharmMLVersion.V0_7_1)){
+				if(version.isEqualOrLaterThan(PharmMLVersion.V0_7_3)){
 					translated_sm.getListOfPopulationParameter().add(tp.toPopulationParameter());
 				} else {
 					translated_sm.getSimpleParameter().add(tp.toSimpleParameter());

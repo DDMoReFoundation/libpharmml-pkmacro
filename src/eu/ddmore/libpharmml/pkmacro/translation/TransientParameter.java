@@ -75,11 +75,11 @@ class TransientParameter implements Assignable {
 		return symbolId;
 	}
 	
-	void setAssign(Rhs rhs){
+	public void setAssign(Rhs rhs){
 		this.assign = rhs;
 	}
 	
-	Rhs getAssign(){
+	public Rhs getAssign(){
 		return assign;
 	}
 	
@@ -104,7 +104,6 @@ class TransientParameter implements Assignable {
 		return rhs;
 	}
 
-	@Override
 	@Deprecated
 	public Rhs assign(Equation equation) {
 		Rhs rhs = new Rhs(equation);

@@ -2,9 +2,6 @@ package eu.ddmore.libpharmml.pkmacro.test;
 
 import java.io.FileInputStream;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +39,7 @@ public class TranslateUseCase7 {
 		Translator tl = new Translator();
 		tl.setParameter(Translator.KEEP_ORDER, true);
 		
-		MacroOutput output = tl.translate(inputSM, PharmMLVersion.V0_7_1);
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.V0_7_3);
 		inputModel.getDom().getModelDefinition().getListOfStructuralModel().set(0, output.getStructuralModel());
 		inputModel.setParameter(IPharmMLResource.AUTOSET_ID, false);
 		testInstance.save(System.out, inputModel);
