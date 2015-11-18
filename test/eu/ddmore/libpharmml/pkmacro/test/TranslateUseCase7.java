@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import eu.ddmore.libpharmml.ILibPharmML;
 import eu.ddmore.libpharmml.IPharmMLResource;
+import eu.ddmore.libpharmml.IValidationReport;
 import eu.ddmore.libpharmml.PharmMlFactory;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.impl.PharmMLVersion;
@@ -43,6 +44,9 @@ public class TranslateUseCase7 {
 		inputModel.getDom().getModelDefinition().getListOfStructuralModel().set(0, output.getStructuralModel());
 		inputModel.setParameter(IPharmMLResource.AUTOSET_ID, false);
 		testInstance.save(System.out, inputModel);
+		
+		IValidationReport report = testInstance.getValidator().createValidationReport(inputModel);
+		AssertUtil.assertValid(report);
 	}
 
 }
