@@ -10,8 +10,9 @@
     <property name="source" value="1.6" />
 
 	<!-- Edit version and build values if needed -->
+	<property name="libpharmml.vendor" value="EMBL-EBI"/>
 	<property name="libpharmml.name" value="libPharmML-PKMacro"/>
-	<property name="libpharmml.version" value="0.1.5"/>
+	<property name="libpharmml.version" value="0.1.6"/>
 	<property name="libpharmml.build" value="1"/>
 	<property name="libpharmml.fullname" value="${libpharmml.name}-${libpharmml.version}-b${libpharmml.build}"/>
 	
@@ -160,6 +161,11 @@
     <target name="jar-bin" depends="build-src,init-jardir" description="Generate a jar for distribution of the library">
         <jar destfile="${jar.dir}/${libpharmml.jar}">
         	<fileset dir="${src.bin.dir}"/>
+        	<manifest>
+        	    <attribute name="Implementation-Vendor" value="${libpharmml.vendor}"/>
+        	    <attribute name="Implementation-Title" value="${libpharmml.name}"/>
+        	    <attribute name="Implementation-Version" value="${libpharmml.version}-b${libpharmml.build}"/>
+        	</manifest>
         	<!--fileset dir="${schema.dir}">
         		<include name="*"/>
         		<exclude name="*.xpr"/>
