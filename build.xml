@@ -13,7 +13,7 @@
 	<property name="libpharmml.vendor" value="EMBL-EBI"/>
 	<property name="libpharmml.name" value="libPharmML-PKMacro"/>
 	<property name="libpharmml.version" value="0.1.6"/>
-	<property name="libpharmml.build" value="1"/>
+	<property name="libpharmml.build" value="2"/>
 	<property name="libpharmml.fullname" value="${libpharmml.name}-${libpharmml.version}-b${libpharmml.build}"/>
 	
 	<property name="src.bin.dir" location="${build.dir}/src"/>
