@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 European Molecular Biology Laboratory,
+ * Copyright (c) 2015-2016 European Molecular Biology Laboratory,
  * Heidelberg, Germany.
  *
  * Licensed under the Apache License, Version 2.0 (the
@@ -47,8 +47,40 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 /**
  * Main class for handling PK macro translation.
+ * 
+ * <p>This class performs all the translation of a given valid {@link StructuralModel} instance. The basic
+ * usage is at follows:
+ * 
+ * <pre>{@code
+ * Translator translator = new Translator();
+ * MacroOutput output = translator.translate(structuralModel, PharmMLVersion.DEFAULT);
+ * StructuralModel translated_sm = output.getStructuralModel();
+ * }</pre>
+ * 
+ * <p>The {@link MacroOutput} object contains the translated {@link StructuralModel} (ie: with equations
+ * and without macros) and the {@link Input} data. If the input model is not valid, an {@link InvalidMacroException}
+ * is likely to be thrown.
+ * 
+ * <p>The translation can be paramaterised using the method {@link #setParameter(String, Boolean)}. The possible parameter names
+ * used as first parameter of this method are:
+ * 
+ * <p><ul>
+ * <li>{@link #KEEP_ORDER} (default=true): for keeping the order of the input model variables.</li>
+ * <li>{@link #KEEP_BLOCK_ID} (default=true): for setting the same blkId value to the output structural model as the input one.</li>
+ * </ul>
+ * 
+ * <p>The variable {@link #TRANSLATED_BLK_ID} contains the value of the translated block id, if the parameter {@link #KEEP_BLOCK_ID}
+ * is set to false. For instance:
+ * 
+ * <pre>
+ * {@code
+ * translator.setParameter(Translator.KEEP_BLOCK_ID, false);
+ * translator.TRANSLATED_BLK_ID = "my_blkId";
+ * }
+ * </pre>
+ * 
  * @author F. Yvon
- *
+ * @version 0.1.7
  */
 @SuppressWarnings("deprecation")
 public class Translator {
