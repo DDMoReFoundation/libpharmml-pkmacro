@@ -57,17 +57,28 @@ public class Translator {
 	
 //	private final VariableFactory variableFactory;
 	
+	public String TRANSLATED_BLK_ID = "translated_sm";
+	
 	private final Map<String, Boolean> parameters;
 		
 	/**
 	 * Parameter for keeping the order of the input PK macros. The output ODEs that symbolise 
-	 * compartments appear in the same order as the macros one. Default value: false.
+	 * compartments appear in the same order as the macros one. Default value: true.
 	 */
 	public final static String KEEP_ORDER = "translator.keeporder";
+	
+	/**
+	 * Parameter for keeping the blkId during the translation process. If true, the output translated
+	 * structural model will have the same blkId as the input structural model. If false, the translated
+	 * structural model will have the blkId value of {@link #TRANSLATED_BLK_ID}, which can be changed.
+	 * Default value: true.
+	 */
+	public final static String KEEP_BLOCK_ID = "translator.keepblockid";
 	
 	public Translator(){
 		parameters = new HashMap<String, Boolean>();
 		parameters.put(KEEP_ORDER, true);
+		parameters.put(KEEP_BLOCK_ID, true);
 	}
 	
 	/**
@@ -204,7 +215,12 @@ public class Translator {
 		List<AbstractMacro> model = parseMacros(listOfPKMacroList,cf,vf);
 		
 		final StructuralModel translated_sm = new StructuralModel();
-		translated_sm.setBlkId("translated_sm");
+		if(parameters.get(KEEP_BLOCK_ID)){
+			translated_sm.setBlkId(sm.getBlkId());
+		} else {
+			translated_sm.setBlkId(TRANSLATED_BLK_ID);
+		}
+		
 		
 		final InputList inputList = new InputList();
 		

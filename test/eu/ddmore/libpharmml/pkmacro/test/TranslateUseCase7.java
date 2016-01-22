@@ -1,5 +1,8 @@
 package eu.ddmore.libpharmml.pkmacro.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import java.io.FileInputStream;
 
 import org.junit.After;
@@ -47,6 +50,26 @@ public class TranslateUseCase7 {
 		
 		IValidationReport report = testInstance.getValidator().createValidationReport(inputModel);
 		AssertUtil.assertValid(report);
+	}
+	
+	@Test
+	public void testKeepBlkId() throws Exception {
+		StructuralModel inputSM = inputModel.getDom().getModelDefinition().getListOfStructuralModel().get(0);
+		Translator tl = new Translator();
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT);
+		assertEquals("Same blkId",inputSM.getBlkId(),output.getStructuralModel().getBlkId());
+	}
+	
+	@Test
+	public void testSetBlkIdValue() throws Exception {
+		final String diffBlockId = "unitTestBlkId";
+		StructuralModel inputSM = inputModel.getDom().getModelDefinition().getListOfStructuralModel().get(0);
+		Translator tl = new Translator();
+		tl.setParameter(Translator.KEEP_BLOCK_ID, false);
+		tl.TRANSLATED_BLK_ID = diffBlockId;
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT);
+		assertNotEquals("Different blkId", inputSM.getBlkId(), output.getStructuralModel().getBlkId());
+		assertEquals("BlkId = "+diffBlockId,diffBlockId,output.getStructuralModel().getBlkId());
 	}
 
 }
