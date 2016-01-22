@@ -27,10 +27,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.JAXBElement;
-
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolType;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
@@ -58,18 +57,18 @@ public class VariableFactory {
 		variables = new ArrayList<CommonVariableDefinition>();
 		parameters = new ArrayList<TransientParameter>();
 		
-		for(JAXBElement<? extends CommonVariableDefinition> v : sm.getCommonVariable()){
-			storeVariable(v.getValue());
+		for(PharmMLElement el : sm.getListOfStructuralModelElements()){
+			if(el instanceof CommonVariableDefinition){
+				storeVariable((CommonVariableDefinition) el);
+			} else if (el instanceof PopulationParameter){
+				storeParameter((PopulationParameter) el);
+			} else if (el instanceof IndividualParameter){
+				storeParameter((IndividualParameter) el);
+			} else if (el instanceof SimpleParameter){
+				storeParameter((SimpleParameter) el);
+			}
 		}
-		for(SimpleParameter p : sm.getSimpleParameter()){
-			storeParameter(p);
-		}
-		for(PopulationParameter pp : sm.getListOfPopulationParameter()){
-			storeParameter(pp);
-		}
-		for(IndividualParameter ip : sm.getListOfIndividualParameter()){
-			storeParameter(ip);
-		}
+		
 	}
 	
 	boolean variableExists(String symbolId){

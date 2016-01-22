@@ -40,7 +40,7 @@ public class TranslateUseCase7 {
 		Translator tl = new Translator();
 		tl.setParameter(Translator.KEEP_ORDER, true);
 		
-		MacroOutput output = tl.translate(inputSM, PharmMLVersion.V0_7_3);
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT);
 		inputModel.getDom().getModelDefinition().getListOfStructuralModel().set(0, output.getStructuralModel());
 		inputModel.setParameter(IPharmMLResource.AUTOSET_ID, false);
 		testInstance.save(System.out, inputModel);

@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
+import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
@@ -85,13 +85,17 @@ public class Translator {
 	 * Equations are added by each fromMacro() method execution.
 	 * @throws InvalidMacroException
 	 */
-	private List<AbstractMacro> parseMacros(PKMacroList list, CompartmentFactory cf, VariableFactory vf) throws InvalidMacroException{
+	private List<AbstractMacro> parseMacros(List<PKMacroList> listOfPKMacroList, CompartmentFactory cf, VariableFactory vf) throws InvalidMacroException{
 		
 		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
+		List<PKMacro> list = new ArrayList<PKMacro>();
+		for(PKMacroList pkMacroList : listOfPKMacroList){
+			list.addAll(pkMacroList.getListOfMacro());
+		}
 		
 		// Core macros
-		for(int i = 0;i<list.getListOfMacro().size();i++){
-			PKMacro xmlMacro = list.getListOfMacro().get(i);
+		for(int i = 0;i<list.size();i++){
+			PKMacro xmlMacro = list.get(i);
 			if(xmlMacro instanceof CompartmentMacro){
 				Compartment macro = Compartment.fromMacro(cf, vf, (CompartmentMacro) xmlMacro);
 				macro.setIndex(i);
@@ -105,8 +109,8 @@ public class Translator {
 		}
 		
 		// Targetted macros
-		for(int i = 0;i<list.getListOfMacro().size();i++){
-			PKMacro xmlMacro = list.getListOfMacro().get(i);
+		for(int i = 0;i<list.size();i++){
+			PKMacro xmlMacro = list.get(i);
 			if(xmlMacro instanceof AbsorptionOralMacro){
 				Absorption macro = Absorption.fromMacro(cf, vf, (AbsorptionOralMacro) xmlMacro);
 				macro.setIndex(i);
@@ -190,7 +194,14 @@ public class Translator {
 		VariableFactory vf = new VariableFactory(sm);
 		CompartmentFactory cf = new CompartmentFactory();
 		
-		List<AbstractMacro> model = parseMacros(sm.getPKmacros(),cf,vf);
+		List<PKMacroList> listOfPKMacroList = new ArrayList<PKMacroList>();
+		for(PharmMLElement smEl : sm.getListOfStructuralModelElements()){
+			if(smEl instanceof PKMacroList){
+				listOfPKMacroList.add((PKMacroList) smEl);
+			}
+		}
+		
+		List<AbstractMacro> model = parseMacros(listOfPKMacroList,cf,vf);
 		
 		final StructuralModel translated_sm = new StructuralModel();
 		translated_sm.setBlkId("translated_sm");
@@ -232,11 +243,9 @@ public class Translator {
 		
 		for(CommonVariableDefinition var : variables){
 			if(var instanceof DerivativeVariable){
-				translated_sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createDerivativeVariable(
-						(DerivativeVariable) var));
+				translated_sm.getListOfStructuralModelElements().add((DerivativeVariable) var);
 			} else if (var instanceof VariableDefinition){
-				translated_sm.getCommonVariable().add(MasterObjectFactory.COMMONTYPES_OF.createVariable(
-						(VariableDefinition) var));
+				translated_sm.getListOfStructuralModelElements().add((VariableDefinition) var);
 			}
 		}
 		
@@ -244,17 +253,17 @@ public class Translator {
 			if(tp.containsReference()){ // the parameter was already defined, so the reference to the same object is added
 				Object ref = tp.getReference();
 				if (ref instanceof PopulationParameter){
-					translated_sm.getListOfPopulationParameter().add((PopulationParameter) ref);
+					translated_sm.getListOfStructuralModelElements().add((PopulationParameter) ref);
 				} else if (ref instanceof IndividualParameter){
-					translated_sm.getListOfIndividualParameter().add((IndividualParameter) ref);
+					translated_sm.getListOfStructuralModelElements().add((IndividualParameter) ref);
 				} else if (ref instanceof SimpleParameter){
-					translated_sm.getSimpleParameter().add((SimpleParameter) ref);
+					translated_sm.getListOfStructuralModelElements().add((SimpleParameter) ref);
 				}
 			} else {
 				if(version.isEqualOrLaterThan(PharmMLVersion.V0_7_3)){
-					translated_sm.getListOfPopulationParameter().add(tp.toPopulationParameter());
+					translated_sm.getListOfStructuralModelElements().add(tp.toPopulationParameter());
 				} else {
-					translated_sm.getSimpleParameter().add(tp.toSimpleParameter());
+					translated_sm.getListOfStructuralModelElements().add(tp.toSimpleParameter());
 				}
 			}
 		}

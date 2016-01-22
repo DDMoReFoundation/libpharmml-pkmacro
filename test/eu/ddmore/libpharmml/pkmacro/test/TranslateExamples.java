@@ -64,7 +64,7 @@ public class TranslateExamples {
 		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// test ODE
-		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(1).getValue();
+		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(1);
 		assertEquals("Ac", Ac.getSymbId());
 		Uniop uniop = Ac.getAssign().getUniop();
 		assertEquals(Unioperator.MINUS, uniop.getOperator());
@@ -86,22 +86,22 @@ public class TranslateExamples {
 		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// ODEs
-		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(1).getValue();
+		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(1);
 		assertEquals("Ac", Ac.getSymbId());
 		assertEquals("dAc/dt = [pm1]ka2 x Ad2 + [pm1]ka3 x Ad3 + [pm1]ka4 x Ad4 - [pm1]k x Ac", 
 				Utils.variableToString(Ac));
 		
-		DerivativeVariable Ad2 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(2).getValue();
+		DerivativeVariable Ad2 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(2);
 		assertEquals("Ad2", Ad2.getSymbId());
 		assertEquals("dAd2/dt = - [pm1]ka2 x Ad2", 
 				Utils.variableToString(Ad2));
 		
-		DerivativeVariable Ad3 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(3).getValue();
+		DerivativeVariable Ad3 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(3);
 		assertEquals("Ad3", Ad3.getSymbId());
 		assertEquals("dAd3/dt = - [pm1]ka3 x Ad3", 
 				Utils.variableToString(Ad3));
 		
-		DerivativeVariable Ad4 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(4).getValue();
+		DerivativeVariable Ad4 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(4);
 		assertEquals("Ad4", Ad4.getSymbId());
 		assertEquals("dAd4/dt = - [pm1]ka4 x Ad4", 
 				Utils.variableToString(Ad4));
@@ -121,34 +121,34 @@ public class TranslateExamples {
 		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// Es
-		VariableDefinition C1 = (VariableDefinition) mo.getStructuralModel().getCommonVariable().get(0).getValue();
+		VariableDefinition C1 = (VariableDefinition) mo.getStructuralModel().getListOfStructuralModelElements().get(0);
 		assertEquals("C1 = Ac1 / [pm1]V1", Utils.variableToString(C1));
 		
-		DerivativeVariable Ac1 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(3).getValue();
+		DerivativeVariable Ac1 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(3);
 		assertEquals("dAc1/dt = - [pm1]k12 x Ap1 + [pm1]k21 x Ap1 + ka x Aa4 + ZeroOrderRate5 - [pm1]k x Ac1", 
 				Utils.variableToString(Ac1));
 		
-		DerivativeVariable Ac3 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(4).getValue();
+		DerivativeVariable Ac3 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(4);
 		assertEquals("dAc3/dt = - [pm1]Vm x Ac3 / [pm1]Km + Ac3", 
 				Utils.variableToString(Ac3));
 		
-		DerivativeVariable Ap1 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(5).getValue();
+		DerivativeVariable Ap1 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(5);
 		assertEquals("dAp1/dt = [pm1]k12 x Ac1 - [pm1]k21 x Ac1", 
 				Utils.variableToString(Ap1));
 		
-		DerivativeVariable Aa4 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(6).getValue();
+		DerivativeVariable Aa4 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(6);
 		assertEquals("dAa4/dt = EXP(LOG(F1 x Dose1) + LOG(Ktr) + n1 x LOG(Ktr x t - t_Dose1) - Ktr x t - t_Dose1 - LOG(FACTORIAL(n1))) - ka x Aa4", 
 				Utils.variableToString(Aa4));
 		
-		DerivativeVariable Ad5 = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(9).getValue();
+		DerivativeVariable Ad5 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(9);
 		assertEquals("dAd5/dt = - ZeroOrderRate5", 
 				Utils.variableToString(Ad5));
 		
-		VariableDefinition ZeroOrderRate5 = (VariableDefinition) mo.getStructuralModel().getCommonVariable().get(10).getValue();
+		VariableDefinition ZeroOrderRate5 = (VariableDefinition) mo.getStructuralModel().getListOfStructuralModelElements().get(10);
 		assertEquals("ZeroOrderRate5 = if (Ad5 gt 0) { LastDoseAmountToAd5 / [pm1]Tk0 } else { 0 }", 
 				Utils.variableToString(ZeroOrderRate5));
 		
-		DerivativeVariable Ce = (DerivativeVariable) mo.getStructuralModel().getCommonVariable().get(12).getValue();
+		DerivativeVariable Ce = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(12);
 		assertEquals("dCe/dt = [pm1]ke0 x C1 - Ce", 
 				Utils.variableToString(Ce));
 		
