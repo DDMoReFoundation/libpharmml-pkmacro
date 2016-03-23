@@ -222,7 +222,7 @@ public class Utils {
 	
 	public static String piecewiseToString(Piecewise pw){
 		StringBuilder sb = new StringBuilder();
-		for(Piece p : pw.getPiece()){
+		for(Piece p : pw.getListOfPiece()){
 			Condition condition = p.getCondition();
 			if(condition.getOtherwise() == null){
 				String conditionString;

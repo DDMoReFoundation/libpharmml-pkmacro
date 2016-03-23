@@ -202,8 +202,8 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		condition_else.setOtherwise(new Otherwise());
 		piece_else.setCondition(condition_else);
 		
-		pw.getPiece().add(piece_Ad_gt_0);
-		pw.getPiece().add(piece_else);
+		pw.getListOfPiece().add(piece_Ad_gt_0);
+		pw.getListOfPiece().add(piece_else);
 		
 		zeroOrderRate.assign(pw);
 		
