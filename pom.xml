@@ -37,6 +37,14 @@
     <scm>
         <connection>scm:git:git://git.code.sf.net/p/ddmore/libpharmml/git</connection>
     </scm>
+    
+    <repositories>
+    	<repository>
+            <id>ebi-repo</id>
+            <name>EBI Repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
