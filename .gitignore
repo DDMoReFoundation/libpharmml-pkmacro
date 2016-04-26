@@ -1,7 +1,6 @@
 /bin
-/.classpath
-/.project
 /.settings
 /jars
 /ivy_libs
 /build
+/target/
