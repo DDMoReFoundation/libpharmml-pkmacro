@@ -107,18 +107,22 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 		return outRate;
 	}
 	
+	/**
+	 * Adds the mathematical expressions to the new peripheral amount:<br>
+	 * dperiphAmt/dt = inRate x centralAmt - outRate * periphAmt
+	 */
 	protected void initOde() {
 		Binop exp1 = new Binop(Binoperator.TIMES, inRate, new SymbolRef(target.getAmount().getSymbId()));
 		Utils.addOperand(amount, Binoperator.PLUS, exp1);
 		
-		Binop exp2 = new Binop(Binoperator.TIMES, outRate, new SymbolRef(target.getAmount().getSymbId()));
+		Binop exp2 = new Binop(Binoperator.TIMES, outRate, new SymbolRef(getAmount().getSymbId()));
 		Utils.addOperand(amount, Binoperator.MINUS, exp2);
 	}
 
 	@Override
 	public void modifyTargetODE() {		
 		// inRate
-		Binop exp1 = new Binop(Binoperator.TIMES, inRate, new SymbolRef(getAmount().getSymbId()));
+		Binop exp1 = new Binop(Binoperator.TIMES, inRate, new SymbolRef(target.getAmount().getSymbId()));
 		Utils.addOperand(target.getAmount(), Binoperator.MINUS, exp1);
 		
 		// outRate

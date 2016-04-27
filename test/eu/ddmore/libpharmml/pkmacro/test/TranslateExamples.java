@@ -125,7 +125,7 @@ public class TranslateExamples {
 		assertEquals("C1 = Ac1 / [pm1]V1", Utils.variableToString(C1));
 		
 		DerivativeVariable Ac1 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(3);
-		assertEquals("dAc1/dt = - [pm1]k12 x Ap1 + [pm1]k21 x Ap1 + ka x Aa4 + ZeroOrderRate5 - [pm1]k x Ac1", 
+		assertEquals("dAc1/dt = - [pm1]k12 x Ac1 + [pm1]k21 x Ap1 + ka x Aa4 + ZeroOrderRate5 - [pm1]k x Ac1", 
 				Utils.variableToString(Ac1));
 		
 		DerivativeVariable Ac3 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(4);
@@ -133,7 +133,7 @@ public class TranslateExamples {
 				Utils.variableToString(Ac3));
 		
 		DerivativeVariable Ap1 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(5);
-		assertEquals("dAp1/dt = [pm1]k12 x Ac1 - [pm1]k21 x Ac1", 
+		assertEquals("dAp1/dt = [pm1]k12 x Ac1 - [pm1]k21 x Ap1", 
 				Utils.variableToString(Ap1));
 		
 		DerivativeVariable Aa4 = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(6);
