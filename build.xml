@@ -12,9 +12,9 @@
 	<!-- Edit version and build values if needed -->
 	<property name="libpharmml.vendor" value="EMBL-EBI"/>
 	<property name="libpharmml.name" value="libPharmML-PKMacro"/>
-	<property name="libpharmml.version" value="0.1.8"/>
+	<property name="libpharmml.version" value="0.1.9"/>
 	<property name="libpharmml.build" value="1"/>
-	<property name="libpharmml.fullname" value="${libpharmml.name}-${libpharmml.version}-b${libpharmml.build}"/>
+	<property name="libpharmml.fullname" value="${libpharmml.name}-${libpharmml.version}-${libpharmml.build}"/>
 	
 	<property name="src.bin.dir" location="${build.dir}/src"/>
 	<property name="test.bin.dir" location="${build.dir}/test"/>
