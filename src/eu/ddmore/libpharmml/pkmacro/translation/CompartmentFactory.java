@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 European Molecular Biology Laboratory,
+ * Copyright (c) 2015-2016 European Molecular Biology Laboratory,
  * Heidelberg, Germany.
  *
  * Licensed under the Apache License, Version 2.0 (the
@@ -32,6 +32,13 @@ class CompartmentFactory {
 		map_compartments = new HashMap<Integer, AbstractCompartment>();
 	}
 	
+	/**
+	 * Gets the compartment corresponding to the given compartment number. If the compartment doesn't
+	 * exist, an {@link InvalidMacroException} is thrown.
+	 * @param cmt Compartment number, usually defined by the "cmt" macro parameter.
+	 * @return The compartment defined by the given index.
+	 * @throws InvalidMacroException If the compartment doesn't exist.
+	 */
 	AbstractCompartment getCompartment(Integer cmt) throws InvalidMacroException{
 		if(map_compartments.containsKey(cmt)){
 			return map_compartments.get(cmt);
@@ -40,6 +47,14 @@ class CompartmentFactory {
 		}
 	}
 	
+	/**
+	 * Adds the provided compartment to the factory so it can be indexed. If a compartment with the same
+	 * cmt number already exists within this factory, an {@link InvalidMacroException} is thrown. One can use
+	 * the method {@link #compartmentExists(Integer)} to check if a compartment with the same index already
+	 * exists.
+	 * @param comp The compartment to be indexed.
+	 * @throws InvalidMacroException If a compartment with the same index exists.
+	 */
 	void addCompartment(AbstractCompartment comp) throws InvalidMacroException{
 		AbstractCompartment previous = map_compartments.put(comp.getCmt(), comp);
 		if(previous != null){
@@ -47,6 +62,10 @@ class CompartmentFactory {
 		}
 	}
 	
+	/**
+	 * Gets the number of compartments in this factory.
+	 * @return The number of compartments in this factory.
+	 */
 	Integer compartmentsSize(){
 		return map_compartments.size();
 	}
@@ -71,6 +90,11 @@ class CompartmentFactory {
 		return null;
 	}
 	
+	/**
+	 * Checks if a compartment with the given cmt index has already been indexed.
+	 * @param cmt The cmt parameter value of the compartment.
+	 * @return true if the compartment already exists, else false.
+	 */
 	boolean compartmentExists(Integer cmt){
 		return map_compartments.containsKey(cmt);
 	}

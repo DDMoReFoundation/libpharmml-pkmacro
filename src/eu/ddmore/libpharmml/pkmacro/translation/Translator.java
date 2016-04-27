@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015-2016 European Molecular Biology Laboratory,
+ * Copyright (c) 2015-2016-2016 European Molecular Biology Laboratory,
  * Heidelberg, Germany.
  *
  * Licensed under the Apache License, Version 2.0 (the
@@ -80,7 +80,7 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * </pre>
  * 
  * @author F. Yvon
- * @version 0.1.7
+ * @version 0.1.9
  */
 @SuppressWarnings("deprecation")
 public class Translator {

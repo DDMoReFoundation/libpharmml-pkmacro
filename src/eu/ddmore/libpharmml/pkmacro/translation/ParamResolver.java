@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 European Molecular Biology Laboratory,
+ * Copyright (c) 2015-2016 European Molecular Biology Laboratory,
  * Heidelberg, Germany.
  *
  * Licensed under the Apache License, Version 2.0 (the
@@ -35,6 +35,11 @@ class ParamResolver {
 	private final Map<String,Rhs> data;
 	private final String macroName;
 
+	/**
+	 * Minimal constructor. The resolver is built around an existing macro that contains defined parameters.
+	 * @param macro A XML macro object.
+	 * @throws InvalidMacroException If one of the parameters is invalid.
+	 */
 	ParamResolver(PKMacro macro) throws InvalidMacroException {
 		data = new Hashtable<String,Rhs>();
 		for(MacroValue value : macro.getListOfValue()){
@@ -55,6 +60,12 @@ class ParamResolver {
 		macroName = macro.getName();
 	}
 	
+	/**
+	 * Returns the value of the given parameter.
+	 * @param argument Name of the argument
+	 * @return The value of the wanted parameter wrapped in a {@link Rhs} element.
+	 * @throws InvalidMacroException If the given argument is not defined for the provided macro.
+	 */
 	Rhs getValue(String argument) throws InvalidMacroException{
 		if(!data.containsKey(argument) || data.get(argument) == null){
 			throw new InvalidMacroException("Argument \""+argument+"\" is undefined in \""+macroName+"\".");
@@ -69,7 +80,7 @@ class ParamResolver {
 	 * @param argument Name of the parameter.
 	 * @param clazz The expect type of the parameter.
 	 * @return The value of the parameter casted to the expected type.
-	 * @throws InvalidMacroException If the parameter does not exist or the type is the expected one.
+	 * @throws InvalidMacroException If the parameter does not exist or if the type is not the expected one.
 	 */
 	@SuppressWarnings("unchecked")
 	<T> T getValue(String argument, Class<T> clazz) throws InvalidMacroException{
@@ -99,6 +110,11 @@ class ParamResolver {
 		return getValue(argument.toString(), clazz);
 	}
 	
+	/**
+	 * Checks if the given argument is defined for the provided macro.
+	 * @param argument Argument name
+	 * @return true if found, else false.
+	 */
 	boolean contains(String argument){
 		return data.containsKey(argument);
 	}
@@ -107,34 +123,4 @@ class ParamResolver {
 		return data.containsKey(argument.toString());
 	}
 	
-//	@Deprecated
-//	private Object getEquationContent(Equation eq){
-//		if(eq.getBinop() != null){
-//			return eq.getBinop();
-//		} else if (eq.getDelay() != null){
-//			return eq.getDelay();
-//		} else if (eq.getFunctionCall() != null){
-//			return eq.getFunctionCall();
-//		} else if (eq.getMatrixSelector() != null){
-//			return eq.getMatrixSelector();
-//		} else if (eq.getPiecewise() != null){
-//			return eq.getPiecewise();
-//		} else if (eq.getProbability() != null){
-//			return eq.getProbability();
-//		} else if (eq.getProduct() != null){
-//			return eq.getProduct();
-//		} else if (eq.getScalar() != null){
-//			return eq.getScalar().getValue();
-//		} else if (eq.getSum() != null){
-//			return eq.getSum();
-//		} else if (eq.getSymbRef() != null){
-//			return eq.getSymbRef();
-//		} else if (eq.getUniop() != null){
-//			return eq.getUniop();
-//		} else if (eq.getVectorSelector() != null){
-//			return eq.getVectorSelector();
-//		} else {
-//			return null;
-//		}
-//	}
 }
