@@ -265,18 +265,23 @@ public class Translator {
 			}
 		}
 		
-		List<CommonVariableDefinition> variables;
+		List<CommonVariableDefinition> variables = new ArrayList<CommonVariableDefinition>();
 		if(parameters.get(KEEP_ORDER)){
 			List<AbstractMacro> sorted = sortByIndex(model);
-			variables = new ArrayList<CommonVariableDefinition>();
 
+			// Fetching variables from each ordered macro first
 			for(AbstractMacro macro : sorted){
-				variables.addAll(macro.getVariables());
+				for(CommonVariableDefinition var : macro.getVariables()){
+					if(!variables.contains(var)){ // macro can share some variables
+						variables.add(var);
+					}
+				}
 			}
 			
+			// Fetching other variables that might have been created during the translation
 			for(CommonVariableDefinition variable : vf.getDefinedVariables()){
 				if(!variables.contains(variable)){
-					variables.add(0, variable);
+					variables.add(0,variable); // added at the beginning so all variables are declared before being used in other equations
 				}
 			}
 			
@@ -286,7 +291,9 @@ public class Translator {
 			}
 			
 		} else {
-			variables = vf.getDefinedVariables();
+			for(CommonVariableDefinition var : vf.getDefinedVariables()){
+				variables.add(var);
+			}
 		}
 		
 		for(CommonVariableDefinition var : variables){

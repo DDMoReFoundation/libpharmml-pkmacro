@@ -1,6 +1,8 @@
 package eu.ddmore.libpharmml.pkmacro.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,6 +17,7 @@ import eu.ddmore.libpharmml.PharmMlFactory;
 import eu.ddmore.libpharmml.dom.PharmML;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
+import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
@@ -64,7 +67,9 @@ public class TranslateExamples {
 		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// test ODE
-		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(1);
+		PharmMLElement var1 = mo.getStructuralModel().getListOfStructuralModelElements().get(1);
+		assertThat("2nd variable is Derivative", var1, instanceOf(DerivativeVariable.class));
+		DerivativeVariable Ac = (DerivativeVariable) var1;
 		assertEquals("Ac", Ac.getSymbId());
 		Uniop uniop = Ac.getAssign().getUniop();
 		assertEquals(Unioperator.MINUS, uniop.getOperator());
@@ -86,7 +91,9 @@ public class TranslateExamples {
 		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
 		
 		// ODEs
-		DerivativeVariable Ac = (DerivativeVariable) mo.getStructuralModel().getListOfStructuralModelElements().get(1);
+		PharmMLElement var1 = mo.getStructuralModel().getListOfStructuralModelElements().get(1);
+		assertThat(var1, instanceOf(DerivativeVariable.class));
+		DerivativeVariable Ac = (DerivativeVariable) var1;
 		assertEquals("Ac", Ac.getSymbId());
 		assertEquals("dAc/dt = [pm1]ka2 x Ad2 + [pm1]ka3 x Ad3 + [pm1]ka4 x Ad4 - [pm1]k x Ac", 
 				Utils.variableToString(Ac));
