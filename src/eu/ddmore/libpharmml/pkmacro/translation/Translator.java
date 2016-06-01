@@ -114,8 +114,8 @@ public class Translator {
 	}
 	
 	/**
-	 * Change the settings of the translation. The only parameter available at the moment
-	 * is {@link #KEEP_ORDER}, with default value "false".
+	 * Change the settings of the translation. The only parameters available at the moment
+	 * are {@link #KEEP_ORDER} and {@link #KEEP_BLOCK_ID}.
 	 * @param parameter The name of the parameter, that must be in the static fields of {@link Translator}.
 	 * @param value The new value the parameter.
 	 */
