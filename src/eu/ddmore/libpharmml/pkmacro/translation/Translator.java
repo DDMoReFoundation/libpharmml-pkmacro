@@ -26,6 +26,7 @@ import java.util.Map;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
+import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
@@ -59,7 +60,8 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * 
  * <p>The {@link MacroOutput} object contains the translated {@link StructuralModel} (ie: with equations
  * and without macros) and the {@link Input} data. If the input model is not valid, an {@link InvalidMacroException}
- * is likely to be thrown.
+ * is likely to be thrown. It is possible to translate a {@link StructuralModel} containing a mix of {@link PKMacro} and
+ * equations. The equations that are already defined in the input model are copied in the generated {@link StructuralModel}.
  * 
  * <p>The translation can be paramaterised using the method {@link #setParameter(String, Boolean)}. The possible parameter names
  * used as first parameter of this method are:
@@ -79,8 +81,12 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * }
  * </pre>
  * 
+ * <p>One should set carefully the blkId of the generated {@link StructuralModel} as the references to the symbols 
+ * located in the input {@link StructuralModel} may be broken after the translation if the new {@link StructuralModel} 
+ * blkId is different.
+ * 
  * @author F. Yvon
- * @version 0.1.9
+ * @version 0.1.10
  */
 @SuppressWarnings("deprecation")
 public class Translator {
@@ -107,6 +113,9 @@ public class Translator {
 	 */
 	public final static String KEEP_BLOCK_ID = "translator.keepblockid";
 	
+	/**
+	 * Empty constructor. The same instance can be used to translate different structural models.
+	 */
 	public Translator(){
 		parameters = new HashMap<String, Boolean>();
 		parameters.put(KEEP_ORDER, true);
@@ -201,6 +210,14 @@ public class Translator {
 //		return map_compartments.get(cmt);
 //	}
 	
+	/**
+	 * Resolve the argument of the given {@link MacroValue} instance. If the attribute returned by {@link MacroValue#getArgument()}
+	 * is not null, this attribute is returned. This attribute can be null if the {@link MacroValue} contains a {@link SymbolRef}
+	 * object. In this case, the argument name is defined by {@link SymbolRef#getSymbIdRef()}.
+	 * @param value The {@link MacroValue} object.
+	 * @return The argument name as a {@link String}. If the argument name is not defined and if the {@link MacroValue} doesn't
+	 * contain a {@link SymbolRef}, this method returns null.
+	 */
 	static String getArgumentName(MacroValue value){
 		if(value.getArgument() != null){
 			return value.getArgument();
@@ -225,7 +242,8 @@ public class Translator {
 	/**
 	 * Translates the given structural model to a set of equations and input data. The equations are
 	 * listed within a transient translated structural model available through the generated {@link MacroOutput}
-	 * implementation.
+	 * implementation. The equations that are defined within the input {@link StructuralModel} alongside with the
+	 * macros are copied in the output model.
 	 * @param sm The structural model that contains PK macros to be translated.
 	 * @param version The wanted PharmML version of the output.
 	 * @return A {@link MacroOutput} implementation.
