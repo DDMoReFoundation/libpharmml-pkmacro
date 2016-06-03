@@ -32,7 +32,7 @@ import eu.ddmore.libpharmml.pkmacro.translation.MacroOutput;
 import eu.ddmore.libpharmml.pkmacro.translation.Translator;
 import eu.ddmore.libpharmml.pkmacro.translation.Utils;
 
-public class TranslateExamples {
+public class TranslateExamplesTest {
 	
 	private ILibPharmML testInstance;
 	

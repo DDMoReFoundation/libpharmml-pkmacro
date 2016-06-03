@@ -18,7 +18,7 @@ import eu.ddmore.libpharmml.impl.PharmMLVersion;
 import eu.ddmore.libpharmml.pkmacro.translation.MacroOutput;
 import eu.ddmore.libpharmml.pkmacro.translation.Translator;
 
-public class TranslateUseCase7 {
+public class TranslateUseCase7Test {
 	
 	private ILibPharmML testInstance;
 	private IPharmMLResource inputModel;
