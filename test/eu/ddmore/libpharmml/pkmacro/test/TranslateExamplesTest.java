@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,6 +38,7 @@ public class TranslateExamplesTest {
 	private ILibPharmML testInstance;
 	
 	private static final String EXAMPLE1 = "examples/PKmacros_advan1.xml";
+	private static final String EXAMPLE7 = "examples/PKmacros_advan12.xml";
 	private static final String EXAMPLE12 = "examples/PKmacros_example12.xml";
 	private static final String EXAMPLE13 = "examples/PKmacros_example13.xml";
 	
@@ -163,6 +165,41 @@ public class TranslateExamplesTest {
 		assertInputEquals(mo.getListOfInput().get(0), InputType.ORAL, 1, "Dose1");
 		assertInputEquals(mo.getListOfInput().get(1), InputType.ORAL, 3, Ad5.getSymbId());
 		assertInputEquals(mo.getListOfInput().get(2), InputType.IV, 2, Ac3.getSymbId());
+	}
+	
+	@Test
+	public void translateExample7() throws Exception {
+		StructuralModel sm = fetchStructuralModel(EXAMPLE7);
+		Translator tl = new Translator();
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
+		
+		List<PharmMLElement> sm_elements = mo.getStructuralModel().getListOfStructuralModelElements();
+		assertEquals("Number of SM elements", 5, sm_elements.size());
+		
+		PharmMLElement var1 = sm_elements.get(0);
+		assertThat(var1, instanceOf(VariableDefinition.class));
+		VariableDefinition cc = (VariableDefinition) var1;
+		assertEquals("Cc = Ac / [pm1]V", Utils.variableToString(cc));
+		
+		PharmMLElement var2 = sm_elements.get(1);
+		assertThat(var2, instanceOf(DerivativeVariable.class));
+		DerivativeVariable d_ac = (DerivativeVariable) var2;
+		assertEquals("dAc/dt = - [pm1]k12 x Ac + [pm1]k21 x Ap1 - [pm1]k13 x Ac + [pm1]k31 x Ap2 + [pm1]ka x Ad4 - [pm1]k x Ac", Utils.variableToString(d_ac));
+		
+		PharmMLElement var3 = sm_elements.get(2);
+		assertThat(var3, instanceOf(DerivativeVariable.class));
+		DerivativeVariable d_ap1 = (DerivativeVariable) var3;
+		assertEquals("dAp1/dt = [pm1]k12 x Ac - [pm1]k21 x Ap1", Utils.variableToString(d_ap1));
+		
+		PharmMLElement var4 = sm_elements.get(3);
+		assertThat(var4, instanceOf(DerivativeVariable.class));
+		DerivativeVariable d_ap2 = (DerivativeVariable) var4;
+		assertEquals("dAp2/dt = [pm1]k13 x Ac - [pm1]k31 x Ap2", Utils.variableToString(d_ap2));
+		
+		PharmMLElement var5 = sm_elements.get(4);
+		assertThat(var5, instanceOf(DerivativeVariable.class));
+		DerivativeVariable d_ad4 = (DerivativeVariable) var5;
+		assertEquals("dAd4/dt = - [pm1]ka x Ad4", Utils.variableToString(d_ad4));
 	}
 	
 	private void assertInputEquals(Input actual, InputType inputType, Integer adm, String target){
