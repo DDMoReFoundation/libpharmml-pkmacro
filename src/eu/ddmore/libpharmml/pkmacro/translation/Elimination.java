@@ -31,6 +31,34 @@ import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.EliminationMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
+/**
+ * <p>Class for the translation of {@link EliminationMacro} objects.
+ * 
+ * <p>Elimination adds a mathematical expression to the tartget compartment "i".
+ * 
+ * <p><h3>Case 1: "k" linear elimination</h3>
+ * <code>elimination(cmt=i, k)</code><br>
+ * add to the "cmt" compartment the expression " - k*cmtAmount[i]"<br>
+ * <p><h3>Case 2: linear elimination with CL</h3>
+ * <code>elimination(cmt=i, volume=V, CL)</code><br>
+ * add to the "cmt" compartment the expression " - CL/V*cmtAmount[i]"<br>
+ * <p><h3>Case 3: "Km & Vm" saturable elimination</h3>
+ * <code>elimination(cmt=i, Km, Vm)</code><br>
+ * add to the "cmt" compartment the expression " - Vm*cmtAmount[i]/(Km + cmtAmount[i])"<br>
+ * 
+ * <p><h2>Example:</h2>
+ * 
+ * <pre>
+ * <code>compartment(cmt=1, amount=Ac, volume=V)</code>
+ * <code>elimination(cmt=1, k)</code>
+ *
+ * is translated to:
+ * 
+ * <code>dAc/dt = -k*Ac</code>
+ * </pre>
+ * 
+ * @author Florent Yvon
+ */
 class Elimination extends AbstractMacro implements CompartmentTargeter {
 	
 	final protected Operand k;

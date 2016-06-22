@@ -28,6 +28,24 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PeripheralMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.TransferRate;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
+/**
+ * <p>Class for the translation of {@link PeripheralMacro} objects.
+ * 
+ * <p>The following peripheral macro:<br>
+ * <center><code>peripheral(k12,k21,amount=Ap)</code></center><br>
+ * 
+ * creates an empty ‘j’ ODE ‘dcmtAmount[j]/dt = ’, i.e. ‘dAp/dt = ’.<br>
+ * <p>‘kij’ or ‘k_i_j’arguments are processed with the label ‘i’ being the one of the central compartment defined before, 
+ * the label ‘j’ being for the current peripheral compartment.<br>
+ * <p>The following mathematical expressions are then added:<br>
+ * ‘- kij * cmtAmount[j]’ to the ‘i’ ODE<br>
+ * ‘+ kij * cmtAmount[i]’ to the ‘current’ ODE<br>
+ * And for the ‘kji’ or ‘k_j_i’ arguments:<br>
+ * ‘- kji * cmtAmount[i]’ to the ‘j’ ODE<br>
+ * ‘+ kji * cmtAmount[j]’ to the ‘current’ ODE<br>
+ * @author Florent Yvon
+ *
+ */
 class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 	
 	private Peripheral(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration, Operand inRate, Operand outRate, AbstractCompartment target) {

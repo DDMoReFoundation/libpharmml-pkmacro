@@ -52,7 +52,8 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * <p>This class performs all the translation of a given valid {@link StructuralModel} instance. The basic
  * usage is at follows:
  * 
- * <pre>{@code
+ * <pre>
+ * {@code
  * Translator translator = new Translator();
  * MacroOutput output = translator.translate(structuralModel, PharmMLVersion.DEFAULT);
  * StructuralModel translated_sm = output.getStructuralModel();
@@ -85,7 +86,19 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * located in the input {@link StructuralModel} may be broken after the translation if the new {@link StructuralModel} 
  * blkId is different.
  * 
- * @author F. Yvon
+ * <p>The details of the translation for each type of macro can be found in the documentation of the following classes:<br>
+ * <ul>
+ * <li>{@link Absorption}</li>
+ * <li>{@link Compartment}</li>
+ * <li>{@link Depot}</li>
+ * <li>{@link Effect}</li>
+ * <li>{@link Elimination}</li>
+ * <li>{@link IV}</li>
+ * <li>{@link Peripheral}</li>
+ * <li>{@link Transfer}</li>
+ * </ul>
+ * 
+ * @author Florent Yvon
  * @version 0.1.10
  */
 @SuppressWarnings("deprecation")
@@ -95,6 +108,9 @@ public class Translator {
 	
 //	private final VariableFactory variableFactory;
 	
+	/**
+	 * The blkID value used for the output {@link StructuralModel} if the option {@link #KEEP_BLOCK_ID} is set to false.
+	 */
 	public String TRANSLATED_BLK_ID = "translated_sm";
 	
 	private final Map<String, Boolean> parameters;

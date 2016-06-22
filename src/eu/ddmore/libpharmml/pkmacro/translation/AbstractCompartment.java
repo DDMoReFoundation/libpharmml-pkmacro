@@ -32,8 +32,10 @@ import eu.ddmore.libpharmml.util.ChainedList;
 /**
  * Every new macro extending this class means adding a new {@link DerivativeVariable} definition
  * in the variable factory.
+ * 
+ * @author Florent Yvon
  */
-abstract class AbstractCompartment extends AbstractMacro implements EquationSource {
+abstract class AbstractCompartment extends AbstractMacro {
 
 	protected final Integer cmt; // transient for refering
 	protected final DerivativeVariable amount;

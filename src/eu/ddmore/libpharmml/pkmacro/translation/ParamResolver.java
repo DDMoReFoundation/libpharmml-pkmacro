@@ -29,6 +29,7 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 /**
  * Class for helping to fetch paramaters in macros
  *
+ * @author Florent Yvon
  */
 class ParamResolver {
 	
@@ -78,12 +79,12 @@ class ParamResolver {
 	 * assigned to an equation, the assumption will be on the content of the equation, and that content
 	 * returned.
 	 * @param argument Name of the parameter.
-	 * @param clazz The expect type of the parameter.
+	 * @param _class The expect type of the parameter.
 	 * @return The value of the parameter casted to the expected type.
 	 * @throws InvalidMacroException If the parameter does not exist or if the type is not the expected one.
 	 */
 	@SuppressWarnings("unchecked")
-	<T> T getValue(String argument, Class<T> clazz) throws InvalidMacroException{
+	<T> T getValue(String argument, Class<T> _class) throws InvalidMacroException{
 		Rhs rhs_value = getValue(argument);
 		Object rhs_content = rhs_value.getContent();
 		// Equation not used anymore
@@ -95,10 +96,10 @@ class ParamResolver {
 //			} else {
 //				throw new InvalidMacroException(argument + " must be defined as a "+ clazz +" object. Actual is "+content.getClass());
 //			}
-		if(clazz.isInstance(rhs_content)){
+		if(_class.isInstance(rhs_content)){
 			return (T) rhs_value.getContent();
 		} else {
-			throw new InvalidMacroException(argument + " must be defined as a"+ clazz +" object. Actual is "+rhs_content);
+			throw new InvalidMacroException(argument + " must be defined as a"+ _class +" object. Actual is "+rhs_content);
 		}
 	}
 	
@@ -106,8 +107,8 @@ class ParamResolver {
 		return getValue(argument.toString());
 	}
 	
-	<T> T getValue(Object argument, Class<T> clazz) throws InvalidMacroException{
-		return getValue(argument.toString(), clazz);
+	<T> T getValue(Object argument, Class<T> _class) throws InvalidMacroException{
+		return getValue(argument.toString(), _class);
 	}
 	
 	/**

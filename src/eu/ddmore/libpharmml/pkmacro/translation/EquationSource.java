@@ -18,7 +18,7 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
-
+@Deprecated
 interface EquationSource {
 	
 

@@ -20,6 +20,8 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 /**
  * Interface implemented by any macro that modifies an existing variable from a compartment.
+ * 
+ * @author Florent Yvon
  */
 interface CompartmentTargeter {
 	

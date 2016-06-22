@@ -32,6 +32,23 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.EffectMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 import eu.ddmore.libpharmml.util.ChainedList;
 
+/**
+ * <p>Macro class for the translation of {@link EffectMacro} objects.
+ * 
+ * <p>The given effet macro:<br>
+ * <center><code>effect(cmt=i, ke0, concentration=Ce)</code></center><br>
+ * creates a new algebraic equation:<br>
+ * <br>
+ * <code>cmtConcentration[i] = cmtAmount[i] / cmtVolume[i]</code><br>
+ * <br>
+ * and a new ODE:<br>
+ * <br>
+ * <code>dCe/dt = ke0*(cmtConcentration[i] - Ce)</code><br>
+ * 
+ * <p>The target compartment "i" must have a predefined concentration, or a {@link InvalidMacroException} will be thrown.
+ * 
+ * @author Florent Yvon
+ */
 class Effect extends AbstractCompartment {
 	
 	final protected Operand ke0;

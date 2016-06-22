@@ -50,7 +50,7 @@ import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
  * PharmML model version. For instance, in PharmML older than 0.7.3, parameters are generated as {@link SimpleParameter}, while
  * the new parameter type is {@link PopulationParameter} for PharmML 0.7.3 and superior.
  * 
- * @author F. Yvon, EMBL-EBI
+ * @author Florent Yvon
  *
  */
 @SuppressWarnings("deprecation")

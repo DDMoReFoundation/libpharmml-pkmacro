@@ -25,12 +25,25 @@ import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.CompartmentMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
+/**
+ * <p>Macro class for the translation of {@link CompartmentMacro} objects.
+ * <p>Each maco compartment(cmt=1, amount=Ac) creates a new empty ODE "dAc/dt=".
+ * @author Florent Yvon
+ */
 class Compartment extends AbstractCompartment {
 	
 	Compartment(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
 		super(cmt, amount, volume, concentration);
 	}
 
+	/**
+	 * Creates a new {@link Compartment} from a PharmML {@link CompartmentMacro} object.
+	 * @param cf The {@link CompartmentFactory} used in this translation process.
+	 * @param vf The {@link VariableFactory} used in this translation process.
+	 * @param macro The {@link CompartmentMacro} instance to be parsed.
+	 * @return A new {@link Compartment} instance.
+	 * @throws InvalidMacroException If the given PharmML macro is incorrect or cannot be translated.
+	 */
 	static Compartment fromMacro(CompartmentFactory cf, VariableFactory vf, CompartmentMacro macro) throws InvalidMacroException{
 		ParamResolver resolver = new ParamResolver(macro);
 		

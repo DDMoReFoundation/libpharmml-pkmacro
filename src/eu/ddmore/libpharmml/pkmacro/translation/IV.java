@@ -27,6 +27,16 @@ import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.IVMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
+/**
+ * <p>Class for the translation of {@link IVMacro} objects.
+ * 
+ * <p>This macro doesn't generate an ODE but only an input element. The {@link Input} element type is {@link InputType#IV},
+ * the administration number is given by either "type" or "adm", and the target determined by the "cmt" number.
+ * 
+ * 
+ * @author Florent Yvon
+ *
+ */
 class IV extends AbstractMacro implements InputSource {
 	
 	protected final AbstractCompartment target;

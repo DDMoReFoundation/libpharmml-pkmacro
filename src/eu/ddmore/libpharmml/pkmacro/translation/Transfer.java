@@ -30,6 +30,18 @@ import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.TransferMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
+/**
+ * <p>Class for the translation of the {@link TransferMacro} objects.
+ * 
+ * <p>The transfer macro adds mathematical expressions to the compartments "from" and "to" as follows:<br>
+ * <center><code>transfer(from=i, to=j, kt=kl)</code></center><br>
+ * 
+ * adds to the "to" compartment: <code>+kl*cmtAmount[i]</code><br>
+ * and adds to the "from" compartment: <code>-kl*cmtAmount[j]</code><br>
+ * 
+ * @author Florent Yvon
+ *
+ */
 class Transfer extends AbstractMacro implements CompartmentTargeter{
 	
 	private final AbstractCompartment from;

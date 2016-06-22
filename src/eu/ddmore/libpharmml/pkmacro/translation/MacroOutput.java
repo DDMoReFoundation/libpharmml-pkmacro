@@ -32,6 +32,8 @@ import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
  * input model, and the other equations that might have been already defined in the input model.</li>
  * 	<li>The list of {@link Input} data.</li>
  * </ul>
+ * 
+ * @author Florent Yvon
  */
 public interface MacroOutput {
 	

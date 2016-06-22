@@ -45,18 +45,18 @@ import eu.ddmore.libpharmml.util.ChainedList;
  * and means ORAL administration
  * </pre>
  * 
- * <p><h3>case 1: without ‘ka’ argument</h3><br>
+ * <p><h3>case 1: without "ka" argument</h3><br>
  * <center><code>depot(adm=a, target=Ac)</code></center><br>
  * Creates a new Input[inputNumber] IV administration, adm=a, target=cmtAmount[i]
  *
- * <p><h3>case 2: with ‘ka’ argument</h3><br>
+ * <p><h3>case 2: with "ka" argument</h3><br>
  * <center><code>depot(adm=i, target=Ac, ka)</code></center><br>
  * corresponds to these 2 macros:
  * <center><code>compartment(cmt=1, amount=Ac)</code></center>
  * <center><code>oral(cmt=1, ka)</code></center><br>
- * i.e. creates new depot compartment and according ODE ‘dcmtAmount[new depot name]/dt = ’, i.e. ‘dAd/dt = - ka*Ad’
- * A new depot compartment is created with the following ODE: ‘dAd/dt = - ka*Ad’.<br>
- * An expression ‘ + ka*Ad’ is added to the target compartment Ac.<br>
+ * i.e. creates new depot compartment and according ODE "dcmtAmount[new depot name]/dt = ", i.e. "dAd/dt = - ka*Ad"
+ * A new depot compartment is created with the following ODE: "dAd/dt = - ka*Ad".<br>
+ * An expression " + ka*Ad" is added to the target compartment Ac.<br>
  * A new Input[inputNumber] ORAL administration, adm=a, target=cmtAmount[i]<br>
  * 
  * @author Florent Yvon

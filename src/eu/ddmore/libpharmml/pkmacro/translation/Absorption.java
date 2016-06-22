@@ -42,6 +42,56 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.AbsorptionOralMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 import eu.ddmore.libpharmml.util.ChainedList;
 
+/**
+ * <p>Macro class for the translation of {@link AbsorptionOralMacro} objects.
+ * 
+ * <p>Different cases can occur depending on the arguments used in the input macros. In every case,
+ * a new depot compartment Ad is created.
+ * 
+ * <p><h3>Case 1: zero order absorption</h3>
+ * 
+ * <pre><center><code>absorption/oral(adm=j, cmt=i, Tk0)</code></center>
+ * - adds "- ZeroInputRate[i]" to the new ODE string
+ * - adds "+ ZeroInputRate[i]" to the "i" target compartment ODE
+ * with ZeroInputRate[i] defined by the following conditional statement as a new algebraic equation (AE):
+ * if ( Ad[i]>0 ) { ZeroOrderRate[i] = LastDoseAmountToAd[i]/Tk0 } else { ZeroOrderRate[i]=0 }
+ * </pre>
+ * 
+ * <p><h3>case 2: first order absorption with "ka" argument</h3>
+ * 
+ * <pre><center><code>oral(adm=a, cmt=i, ka)</code></center>
+ * - adds "+ ka*cmtAmount[new "j"]" to the target compartment "i"
+ * - adds "- ka*cmtAmount[new "j"]" to the current depot compartment ODE
+ * </pre>
+ * 
+ * <p><h3>Case 3: transit compartments absorption with additional "Ktr" and "Mtt"</h3>
+ * 
+ * <pre><center><code>oral(adm=a, cmt=i, ka, Ktr, Mtt)</code></center>
+ * - new absorption compartment, e.g. "Aa" 
+ * - adds "+ ka*Aa" to the target compartment "i"
+ * - adds the following new ODE "dAa/dt = exp[log(F*Dose)) + log(Ktr) + n*log(Ktr*(t-t_Dose)) - Ktr*(t-t_Dose) - log(n!)] - ka*Aa" 
+ * - Note: in this case only the "Aa" compartment in newly created - the new "Ad" compartment as described earlier is redundant.
+ * for simplicity (ii) assumes there is only one administration defined with "Ktr/Mtt", otherwise need more compartments and related ODs, i.e. Aa1 with "dAa1/dt=..."
+ * - target "Dose"</pre>
+ * 
+ * <p><h2>Example:</h2>
+ * 
+ * <pre>
+ * compartment(cmt=1, amount=Ac, concentration=Cc, volume=V)
+ * oral(adm=1, cmt=1, Tk0)
+ * 
+ * gives:
+ * 
+ * dAc/dt= + ZeroOrderRate2
+ * dAd2/dt= - ZeroOrderRate2
+ * if (Ad2>0) {ZeroOrderRate2 = LastDoseAmountToAd2/Tk0} else {ZeroOrderRate2=0}
+ * 
+ * Input[1]: ORAL administration, adm=1, target=Ad2
+ * 
+ * </pre>
+ * 
+ * @author Florent Yvon
+ */
 class Absorption extends AbstractCompartment implements CompartmentTargeter, InputSource {
 
 	protected final Scalar adm;
@@ -61,6 +111,21 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	protected VariableDefinition zeroOrderRate = null;
 	protected VariableDefinition lastDoseAmountToAd = null;
 		
+	/**
+	 * Minimal contructor.
+	 * @param adm
+	 * @param tlag
+	 * @param tk0
+	 * @param ka
+	 * @param ktr
+	 * @param mtt
+	 * @param p
+	 * @param target The target compartment of this absorption.
+	 * @param type
+	 * @param cmt
+	 * @param amount The variable of this compartment (Ad).
+	 * @param vf The {@link VariableFactory} used in the current translation process.
+	 */
 	protected Absorption(Scalar adm, Operand tlag, Operand tk0, Operand ka, Operand ktr, Operand mtt, Operand p,
 			AbstractCompartment target, Type type, Integer cmt, DerivativeVariable amount, VariableFactory vf) {
 		super(cmt, amount, null, null);

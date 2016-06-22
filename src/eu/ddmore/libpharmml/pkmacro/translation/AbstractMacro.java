@@ -26,6 +26,8 @@ import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 
 /**
  * Root class of any translated macro.
+ * 
+ * @author Florent Yvon
  */
 public abstract class AbstractMacro {
 	

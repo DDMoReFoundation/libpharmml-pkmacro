@@ -18,6 +18,7 @@
  *******************************************************************************/
 package eu.ddmore.libpharmml.pkmacro.translation;
 
+import eu.ddmore.libpharmml.dom.commontypes.Assignable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Rhs;
@@ -35,19 +36,34 @@ import eu.ddmore.libpharmml.dom.maths.Piecewise;
 import eu.ddmore.libpharmml.dom.maths.Uniop;
 import eu.ddmore.libpharmml.dom.maths.Unioperator;
 
+/**
+ * Utility class for common functions used in the translator.
+ * 
+ * @author Florent Yvon
+ */
 public class Utils {
 	
-	static void addOperand(DerivativeVariable var, Binoperator op, Operand operand){
+	/**
+	 * Adds an operand to an existing variable. If this variable has already an assignment, the new operand is added to the assigned
+	 * mathematical expression.
+	 * @param var The {@link Assignable} variable which the operand will be added to.
+	 * @param op The operator for the new operand.
+	 * @param operand The mathematical {@link Operand} expression to be added.
+	 */
+	public static void addOperand(Assignable var, Binoperator op, Operand operand){
 		Rhs rhs = var.getAssign();
+		// If the variable doesn't have an assignment, an empty one is created
 		if(rhs == null){
 			rhs = new Rhs();
 			var.setAssign(rhs);
 		}
 		Operand content = getContent(rhs);
 		if(content == null){
+			// If no content, a negative expression is added as a uniop, as we can't have a binop with a null element.
 			if(op.equals(Binoperator.MINUS) && operand instanceof ExpressionValue){
 				Uniop uniop = new Uniop(Unioperator.MINUS, (ExpressionValue) operand);
 				rhs.setUniop(uniop);
+			// For a positive expression, the operand is added on its own.
 			} else if(op.equals(Binoperator.PLUS)) {
 				if(operand instanceof SymbolRef){
 					rhs.setSymbRef((SymbolRef) operand);
@@ -62,11 +78,17 @@ public class Utils {
 				}
 			}
 		} else {
+			// Assign a new binop containing the math expression already assigned and the new one.
 			Binop newBinop = new Binop(op, content, operand);
 			rhs.setBinop(newBinop);
 		}
 	}
 	
+	/**
+	 * Gets the content of the given {@link Rhs} object assuming it's an {@link Operand} one.
+	 * @param rhs The {@link Rhs} element containing the wanted operand.
+	 * @return The content of the rhs as an {@link Operand}.
+	 */
 	private static Operand getContent(Rhs rhs){
 		Object content = rhs.getContent();
 		if(content instanceof Operand){
@@ -74,10 +96,16 @@ public class Utils {
 		} else if (content == null) {
 			return null;
 		} else {
+			// Should not happen.
 			throw new RuntimeException("Unsupported operation on non operand object ("+content+")");
 		}
 	}
 	
+	/**
+	 * Pretty print function for a {@link DerivativeVariable} element.
+	 * @param dv The {@link DerivativeVariable} and its content that will be printed.
+	 * @return A {@link String} representation of the given variable.
+	 */
 	public static String variableToString(DerivativeVariable dv){
 		StringBuilder sb = new StringBuilder();
 		sb.append("d"+dv.getSymbId()+"/dt = ");
@@ -93,6 +121,11 @@ public class Utils {
 		return sb.toString();
 	}
 	
+	/**
+	 * Pretty print function for a {@link VariableDefinition} element.
+	 * @param v The {@link VariableDefinition} and its content that will be printed.
+	 * @return A {@link String} representation of the given variable.
+	 */
 	public static String variableToString(VariableDefinition v){
 		StringBuilder sb = new StringBuilder();
 		sb.append(v.getSymbId()+" = ");
@@ -110,6 +143,11 @@ public class Utils {
 		return sb.toString();
 	}
 	
+	/**
+	 * Pretty print function for a {@link Binop} element.
+	 * @param binop The {@link Binop} and its content that will be printed.
+	 * @return A {@link String} representation of the given binop.
+	 */
 	public static String binopToString(Binop binop){
 		StringBuilder sb = new StringBuilder();
 		Operand op1 = binop.getOperand1();
@@ -164,6 +202,11 @@ public class Utils {
 		return sb.toString();
 	}
 	
+	/**
+	 * Pretty print function for a {@link Uniop} element.
+	 * @param uniop The {@link Uniop} and its content that will be printed.
+	 * @return A {@link String} representation of the given uniop.
+	 */
 	public static String uniopToString(Uniop uniop){
 		StringBuilder sb = new StringBuilder();
 		
@@ -182,6 +225,11 @@ public class Utils {
 		return sb.toString();
 	}
 	
+	/**
+	 * Pretty print function for a {@link Operand} element.
+	 * @param op The {@link Operand} and its content that will be printed.
+	 * @return A {@link String} representation of the given operand.
+	 */
 	public static String operandToString(Operand op){
 		StringBuilder sb = new StringBuilder();
 		if(op instanceof SymbolRef){
@@ -202,6 +250,11 @@ public class Utils {
 		return sb.toString();
 	}
 	
+	/**
+	 * Pretty print function for a {@link ExpressionValue} element.
+	 * @param ev The {@link ExpressionValue} and its content that will be printed.
+	 * @return A {@link String} representation of the given expression.
+	 */
 	public static String expressionValueToString(ExpressionValue ev){
 		if(ev instanceof Operand){
 			return operandToString((Operand) ev);
@@ -210,16 +263,28 @@ public class Utils {
 		}
 	}
 	
+	/**
+	 * Pretty print function for an unknown element. This method may be used as a default pretty printer if the type
+	 * of the object does not match the parameter type of the other methods of this {@link Utils} class.
+	 * @param o The object that will be printed
+	 * @return A {@link String} representation of the given object.
+	 */
 	public static String objectToString(Object o){
 		if(o instanceof CommonVariableDefinition){
 			return ((CommonVariableDefinition) o).getSymbId();
 		} else if (o instanceof Scalar){
 			return ((Scalar) o).valueToString();
 		} else {
+			// Default case
 			return String.valueOf(o);
 		}
 	}
 	
+	/**
+	 * Pretty print function for a {@link Piecewise} element.
+	 * @param pw The {@link Piecewise} and its content that will be printed.
+	 * @return A {@link String} representation of the given piecewise element.
+	 */
 	public static String piecewiseToString(Piecewise pw){
 		StringBuilder sb = new StringBuilder();
 		for(Piece p : pw.getListOfPiece()){
