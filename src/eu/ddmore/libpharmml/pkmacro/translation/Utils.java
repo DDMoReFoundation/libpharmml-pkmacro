@@ -20,11 +20,10 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 import eu.ddmore.libpharmml.dom.commontypes.Assignable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
-import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Rhs;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
+import eu.ddmore.libpharmml.dom.commontypes.Symbol;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
-import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Condition;
@@ -100,33 +99,13 @@ public class Utils {
 			throw new RuntimeException("Unsupported operation on non operand object ("+content+")");
 		}
 	}
-	
+
 	/**
-	 * Pretty print function for a {@link DerivativeVariable} element.
-	 * @param dv The {@link DerivativeVariable} and its content that will be printed.
+	 * Pretty print function for a variable.
+	 * @param v The variable and its content that will be printed.
 	 * @return A {@link String} representation of the given variable.
 	 */
-	public static String variableToString(DerivativeVariable dv){
-		StringBuilder sb = new StringBuilder();
-		sb.append("d"+dv.getSymbId()+"/dt = ");
-		if(dv.getAssign() != null){
-			if(dv.getAssign().getBinop() != null){
-				sb.append(binopToString(dv.getAssign().getBinop()));
-			} else if (dv.getAssign().getUniop() != null){
-				sb.append(uniopToString(dv.getAssign().getUniop()));
-			} else {
-				sb.append(dv.getAssign().getContent());
-			}
-		}
-		return sb.toString();
-	}
-	
-	/**
-	 * Pretty print function for a {@link VariableDefinition} element.
-	 * @param v The {@link VariableDefinition} and its content that will be printed.
-	 * @return A {@link String} representation of the given variable.
-	 */
-	public static String variableToString(VariableDefinition v){
+	public static <T extends Assignable & Symbol> String variableToString(T v){
 		StringBuilder sb = new StringBuilder();
 		sb.append(v.getSymbId()+" = ");
 		if(v.getAssign() != null){
