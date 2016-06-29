@@ -26,6 +26,8 @@ import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
+import eu.ddmore.libpharmml.dom.maths.Binop;
+import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.DepotMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
@@ -47,7 +49,7 @@ import eu.ddmore.libpharmml.util.ChainedList;
  * 
  * <p><h3>case 1: without "ka" argument</h3><br>
  * <center><code>depot(adm=a, target=Ac)</code></center><br>
- * Creates a new Input[inputNumber] IV administration, adm=a, target=cmtAmount[i]
+ * Creates a new Input[inputNumber] IV administration, adm=a, target=[Ac compartment]
  *
  * <p><h3>case 2: with "ka" argument</h3><br>
  * <center><code>depot(adm=i, target=Ac, ka)</code></center><br>
@@ -57,11 +59,11 @@ import eu.ddmore.libpharmml.util.ChainedList;
  * i.e. creates new depot compartment and according ODE "dcmtAmount[new depot name]/dt = ", i.e. "dAd/dt = - ka*Ad"
  * A new depot compartment is created with the following ODE: "dAd/dt = - ka*Ad".<br>
  * An expression " + ka*Ad" is added to the target compartment Ac.<br>
- * A new Input[inputNumber] ORAL administration, adm=a, target=cmtAmount[i]<br>
+ * A new Input[inputNumber] ORAL administration, adm=a, target=[Ad compartment]<br>
  * 
  * @author Florent Yvon
  */
-class Depot extends AbstractMacro implements InputSource {
+class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 	
 	/**
 	 * The target is this time a {@link DerivativeVariable}, because this macro works with explicit
@@ -89,6 +91,7 @@ class Depot extends AbstractMacro implements InputSource {
 		if(pr.contains(DepotMacro.Arg.KA)){
 			ka = pr.getValue(DepotMacro.Arg.KA, Operand.class);
 			// Depot with ka equals to compartment and oral macros
+			// 
 			getLogger().info("Depot macro translated to 1 Compartment and 1 Oral");
 			Compartment comp = new Compartment(cf.lowestAvailableId(), target, null, null);
 			cf.addCompartment(comp);
@@ -118,6 +121,15 @@ class Depot extends AbstractMacro implements InputSource {
 	@Override
 	List<CommonVariableDefinition> getVariables() {
 		return new ChainedList<CommonVariableDefinition>().addIfNotNull(target);
+	}
+
+	@Override
+	public void modifyTargetODE() {
+		// Same as Absorption with FIRST_ORDER (but we are working directly with the variable and not the compartment here)
+		if(ka != null){
+			Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(target.getSymbId()));
+			Utils.addOperand(target,Binoperator.PLUS, binop);
+		}
 	}
 	
 	
