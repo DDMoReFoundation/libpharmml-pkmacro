@@ -24,6 +24,8 @@ import eu.ddmore.libpharmml.dom.MasterObjectFactory;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
+import eu.ddmore.libpharmml.dom.commontypes.RealValue;
+import eu.ddmore.libpharmml.dom.commontypes.Rhs;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
@@ -289,9 +291,9 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		SymbolRef doseRef = new SymbolRef(dose.getSymbId());
 		VariableDefinition t_dose = vf.generateVariable("t_Dose");
 		SymbolRef t_doseRef = new SymbolRef(t_dose.getSymbId());
-		SymbolRef n = vf.createAndReferNewParameter("n");
-		SymbolRef f = vf.createAndReferNewParameter("F");
-		SymbolRef t = new SymbolRef("t"); // must be defined as IndependentVariable
+		SymbolRef n = vf.createAndReferNewParameter("n", new Rhs(new RealValue(5)));
+		SymbolRef f = vf.createAndReferNewParameter("F", new Rhs(new RealValue(1)));
+		SymbolRef t = new SymbolRef("t"); // must be defined as IndependentVariable //TODO: give independent variable to the translator
 		
 		// log(F*Dose)
 		Uniop logFDose = new Uniop();
