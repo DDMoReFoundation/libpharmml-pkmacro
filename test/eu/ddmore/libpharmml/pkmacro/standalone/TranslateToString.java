@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 
 import eu.ddmore.libpharmml.IPharmMLResource;
 import eu.ddmore.libpharmml.PharmMlFactory;
+import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
@@ -39,12 +40,14 @@ public class TranslateToString {
 		
 		sm = resource.getDom().getModelDefinition().getListOfStructuralModel().get(0);
 		if(sm == null) throw new NullPointerException();
+		IndependentVariable time = resource.getDom().getListOfIndependentVariable().get(0);
 		
 		println("Input:");
+		println("Independent variable="+time.getSymbId());
 		printStructuralModel(sm);
 		
 		Translator tl = new Translator();
-		MacroOutput output = tl.translate(sm, sm.getUnmarshalVersion());
+		MacroOutput output = tl.translate(sm, sm.getUnmarshalVersion(),time);
 		
 		StructuralModel tl_sm = output.getStructuralModel();
 		

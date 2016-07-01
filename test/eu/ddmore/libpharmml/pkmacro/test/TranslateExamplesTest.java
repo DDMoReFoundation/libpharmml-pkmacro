@@ -15,6 +15,7 @@ import org.junit.Test;
 import eu.ddmore.libpharmml.ILibPharmML;
 import eu.ddmore.libpharmml.IPharmMLResource;
 import eu.ddmore.libpharmml.PharmMlFactory;
+import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.PharmML;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
@@ -42,6 +43,8 @@ public class TranslateExamplesTest {
 	private static final String EXAMPLE12 = "examples/PKmacros_example12.xml";
 	private static final String EXAMPLE13 = "examples/PKmacros_example13.xml";
 	
+	private IndependentVariable time;
+	
 	@Before
 	public void setUp() throws Exception {
 		this.testInstance = PharmMlFactory.getInstance().createLibPharmML();
@@ -57,6 +60,7 @@ public class TranslateExamplesTest {
 				new FileInputStream(fileName));
 
 		PharmML dom = res.getDom();
+		time = dom.getListOfIndependentVariable().get(0);
 		ModelDefinition mdef = dom.getModelDefinition();
 		StructuralModel sm = mdef.getListOfStructuralModel().get(0);
 		return sm;
@@ -66,7 +70,7 @@ public class TranslateExamplesTest {
 	public void translateExample1() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE1);
 		Translator tl = new Translator();
-		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion(),time);
 		
 		// test ODE
 		PharmMLElement var1 = mo.getStructuralModel().getListOfStructuralModelElements().get(1);
@@ -90,7 +94,7 @@ public class TranslateExamplesTest {
 	public void translateExample12() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE12);
 		Translator tl = new Translator();
-		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion(),time);
 		
 		// ODEs
 		PharmMLElement var1 = mo.getStructuralModel().getListOfStructuralModelElements().get(1);
@@ -127,7 +131,7 @@ public class TranslateExamplesTest {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE13);
 		Translator tl = new Translator();
 		tl.setParameter(Translator.KEEP_ORDER, false);
-		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion(),time);
 		
 		// Es
 		VariableDefinition C1 = (VariableDefinition) mo.getStructuralModel().getListOfStructuralModelElements().get(0);
@@ -171,7 +175,7 @@ public class TranslateExamplesTest {
 	public void translateExample7() throws Exception {
 		StructuralModel sm = fetchStructuralModel(EXAMPLE7);
 		Translator tl = new Translator();
-		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion());
+		MacroOutput mo = tl.translate(sm, sm.getUnmarshalVersion(),time);
 		
 		List<PharmMLElement> sm_elements = mo.getStructuralModel().getListOfStructuralModelElements();
 		assertEquals("Number of SM elements", 5, sm_elements.size());

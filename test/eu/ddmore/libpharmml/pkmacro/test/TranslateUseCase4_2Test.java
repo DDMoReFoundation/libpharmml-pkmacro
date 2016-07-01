@@ -14,6 +14,7 @@ import org.junit.Test;
 import eu.ddmore.libpharmml.ILibPharmML;
 import eu.ddmore.libpharmml.IPharmMLResource;
 import eu.ddmore.libpharmml.PharmMlFactory;
+import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.PharmML;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
@@ -28,6 +29,7 @@ public class TranslateUseCase4_2Test {
 	
 	private ILibPharmML testInstance;
 	private IPharmMLResource inputModel;
+	private IndependentVariable time;
 	private Translator translator;
 	
 	private static final String USECASE_4_2 = "examples/UseCase4_2.xml";
@@ -48,6 +50,7 @@ public class TranslateUseCase4_2Test {
 	
 	private StructuralModel fetchStructuralModel(IPharmMLResource res){
 		PharmML dom = res.getDom();
+		time = dom.getListOfIndependentVariable().get(0);
 		ModelDefinition mdef = dom.getModelDefinition();
 		StructuralModel sm = mdef.getListOfStructuralModel().get(0);
 		return sm;
@@ -56,7 +59,7 @@ public class TranslateUseCase4_2Test {
 	@Test
 	public void testTranslate() throws Exception {
 		StructuralModel sm = fetchStructuralModel(inputModel);
-		MacroOutput output = translator.translate(sm, PharmMLVersion.DEFAULT);
+		MacroOutput output = translator.translate(sm, PharmMLVersion.DEFAULT,time);
 		
 		StructuralModel tl_sm = output.getStructuralModel();
 		assertEquals("Number of variables", 3, tl_sm.getListOfStructuralModelElements().size());

@@ -27,9 +27,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
+import eu.ddmore.libpharmml.dom.commontypes.Rhs;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolType;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
@@ -37,6 +39,7 @@ import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
+import eu.ddmore.libpharmml.impl.LoggerWrapper;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 /**
@@ -52,6 +55,9 @@ public class VariableFactory {
 	public static String ABSORPTION_PREFIX = "Aa";
 	public static String CENTRAL_CMT_PREFIX = "Ac";
 	public static String PERIPH_CMT_PREFIX = "Ap";
+	public static String DEFAULT_TIME_SYMBOL = "t";
+	
+	private IndependentVariable time = null;
 		
 	private final Map<String, Set<Integer>> variables_count;
 	
@@ -81,6 +87,33 @@ public class VariableFactory {
 			}
 		}
 		
+	}
+	
+	/**
+	 * Sets the time variable that may be used within the generated ODEs via symbol references.
+	 * @param t The {@link IndependentVariable} object used in the model.
+	 */
+	void setTimeVariable(IndependentVariable t){
+		if(t == null || t.getSymbId() == null){
+			LoggerWrapper.getLogger().warning("Independent time variable is null");
+			this.time = null;
+		} else {
+			this.time = t;
+		}
+	}
+	
+	/**
+	 * Creates a symbol reference to the time variable. If this variable is not set, a reference to the
+	 * {@link #DEFAULT_TIME_SYMBOL} is created, potentially causing an invalid translated model. This method
+	 * should be called only after the method {@link #setTimeVariable(IndependentVariable)} execution.
+	 * @return A {@link SymbolRef} object to the time variable.
+	 */
+	SymbolRef createTimeReference(){
+		if(time != null){
+			return new SymbolRef(time.getSymbId());
+		} else {
+			return new SymbolRef(DEFAULT_TIME_SYMBOL);
+		}
 	}
 	
 	/**
@@ -223,8 +256,28 @@ public class VariableFactory {
 		return max;
 	}
 	
+	/**
+	 * Creates a new parameter. The parameter will be located within the
+	 * generated {@link StructuralModel}.
+	 * @param name Name of the parameter. A suffix will be generated to make sure it's unique.
+	 * @return A reference to the created parameter via a {@link SymbolRef} element.
+	 */
 	SymbolRef createAndReferNewParameter(String name){
 		TransientParameter param = generateParameter(name);
+		SymbolRef symbRef = new SymbolRef(param.getSymbolId());
+		return symbRef;
+	}
+	
+	/**
+	 * Creates a new parameter with the given value. The parameter will be located within the
+	 * generated {@link StructuralModel}.
+	 * @param name Name of the parameter. A suffix will be generated to make sure it's unique.
+	 * @param value The initial value of this parameter.
+	 * @return A reference to the created parameter via a {@link SymbolRef} element.
+	 */
+	SymbolRef createAndReferNewParameter(String name, Rhs value){
+		TransientParameter param = generateParameter(name);
+		param.setAssign(value);
 		SymbolRef symbRef = new SymbolRef(param.getSymbolId());
 		return symbRef;
 	}

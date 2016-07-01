@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
@@ -262,13 +263,34 @@ public class Translator {
 	 * macros are copied in the output model.
 	 * @param sm The structural model that contains PK macros to be translated.
 	 * @param version The wanted PharmML version of the output.
+	 * @param t The {@link IndependentVariable} of the model corresponding to time.
+	 * @return A {@link MacroOutput} implementation.
+	 * @throws InvalidMacroException If the translation is not possible because of any invalid
+	 * macro within the model.
+	 * 
+	 * @deprecated The independent "t" variable should be provided to the translator. Use {@link #translate(StructuralModel, PharmMLVersion, IndependentVariable)}.
+	 */
+	@Deprecated
+	public MacroOutput translate(StructuralModel sm, PharmMLVersion version) throws InvalidMacroException{
+		return translate(sm, version, null);
+	}
+	
+	/**
+	 * Translates the given structural model to a set of equations and input data. The equations are
+	 * listed within a transient translated structural model available through the generated {@link MacroOutput}
+	 * implementation. The equations that are defined within the input {@link StructuralModel} alongside with the
+	 * macros are copied in the output model.
+	 * @param sm The structural model that contains PK macros to be translated.
+	 * @param version The wanted PharmML version of the output.
+	 * @param t The {@link IndependentVariable} of the model corresponding to time.
 	 * @return A {@link MacroOutput} implementation.
 	 * @throws InvalidMacroException If the translation is not possible because of any invalid
 	 * macro within the model.
 	 */
-	public MacroOutput translate(StructuralModel sm, PharmMLVersion version) throws InvalidMacroException{
+	public MacroOutput translate(StructuralModel sm, PharmMLVersion version, IndependentVariable t) throws InvalidMacroException{
 		
 		VariableFactory vf = new VariableFactory(sm);
+		vf.setTimeVariable(t);
 		CompartmentFactory cf = new CompartmentFactory();
 		
 		List<PKMacroList> listOfPKMacroList = new ArrayList<PKMacroList>();

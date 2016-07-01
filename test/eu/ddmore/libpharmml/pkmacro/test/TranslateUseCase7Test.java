@@ -13,6 +13,7 @@ import eu.ddmore.libpharmml.ILibPharmML;
 import eu.ddmore.libpharmml.IPharmMLResource;
 import eu.ddmore.libpharmml.IValidationReport;
 import eu.ddmore.libpharmml.PharmMlFactory;
+import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.impl.PharmMLVersion;
 import eu.ddmore.libpharmml.pkmacro.translation.MacroOutput;
@@ -40,10 +41,11 @@ public class TranslateUseCase7Test {
 	@Test
 	public void testKeepOrder() throws Exception {
 		StructuralModel inputSM = inputModel.getDom().getModelDefinition().getListOfStructuralModel().get(0);
+		IndependentVariable time = inputModel.getDom().getListOfIndependentVariable().get(0);
 		Translator tl = new Translator();
 		tl.setParameter(Translator.KEEP_ORDER, true);
 		
-		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT);
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT,time);
 		inputModel.getDom().getModelDefinition().getListOfStructuralModel().set(0, output.getStructuralModel());
 		inputModel.setParameter(IPharmMLResource.AUTOSET_ID, false);
 		testInstance.save(System.out, inputModel);
@@ -55,8 +57,9 @@ public class TranslateUseCase7Test {
 	@Test
 	public void testKeepBlkId() throws Exception {
 		StructuralModel inputSM = inputModel.getDom().getModelDefinition().getListOfStructuralModel().get(0);
+		IndependentVariable time = inputModel.getDom().getListOfIndependentVariable().get(0);
 		Translator tl = new Translator();
-		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT);
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT,time);
 		assertEquals("Same blkId",inputSM.getBlkId(),output.getStructuralModel().getBlkId());
 	}
 	
@@ -64,10 +67,11 @@ public class TranslateUseCase7Test {
 	public void testSetBlkIdValue() throws Exception {
 		final String diffBlockId = "unitTestBlkId";
 		StructuralModel inputSM = inputModel.getDom().getModelDefinition().getListOfStructuralModel().get(0);
+		IndependentVariable time = inputModel.getDom().getListOfIndependentVariable().get(0);
 		Translator tl = new Translator();
 		tl.setParameter(Translator.KEEP_BLOCK_ID, false);
 		tl.TRANSLATED_BLK_ID = diffBlockId;
-		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT);
+		MacroOutput output = tl.translate(inputSM, PharmMLVersion.DEFAULT,time);
 		assertNotEquals("Different blkId", inputSM.getBlkId(), output.getStructuralModel().getBlkId());
 		assertEquals("BlkId = "+diffBlockId,diffBlockId,output.getStructuralModel().getBlkId());
 	}
