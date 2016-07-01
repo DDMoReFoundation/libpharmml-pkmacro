@@ -20,6 +20,7 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 import eu.ddmore.libpharmml.dom.commontypes.Assignable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
+import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Rhs;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.Symbol;
@@ -107,7 +108,13 @@ public class Utils {
 	 */
 	public static <T extends Assignable & Symbol> String variableToString(T v){
 		StringBuilder sb = new StringBuilder();
-		sb.append(v.getSymbId()+" = ");
+		String symbolId;
+		if(v instanceof DerivativeVariable){
+			symbolId = "d"+v.getSymbId()+"/dt";
+		} else {
+			symbolId = v.getSymbId();
+		}
+		sb.append(symbolId+" = ");
 		if(v.getAssign() != null){
 			if(v.getAssign().getBinop() != null){
 				sb.append(binopToString(v.getAssign().getBinop()));
