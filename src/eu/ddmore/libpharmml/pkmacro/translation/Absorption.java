@@ -292,8 +292,13 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		VariableDefinition t_dose = vf.generateVariable("t_Dose");
 		SymbolRef t_doseRef = new SymbolRef(t_dose.getSymbId());
 		SymbolRef n = vf.createAndReferNewParameter("n", new Rhs(new RealValue(5)));
-		SymbolRef f = vf.createAndReferNewParameter("F", new Rhs(new RealValue(1)));
-		SymbolRef t = new SymbolRef("t"); // must be defined as IndependentVariable //TODO: give independent variable to the translator
+		Operand f;
+		if(p != null){
+			f = p;
+		} else {
+			f = vf.createAndReferNewParameter("F", new Rhs(new RealValue(1)));
+		}
+		SymbolRef t = vf.createTimeReference();
 		
 		// log(F*Dose)
 		Uniop logFDose = new Uniop();
