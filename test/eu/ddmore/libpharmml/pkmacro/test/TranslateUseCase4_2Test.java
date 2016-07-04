@@ -83,7 +83,7 @@ public class TranslateUseCase4_2Test {
 		
 		assertEquals("CENTRAL", d_central.getSymbId());
 		assertNotNull(d_central.getAssign());
-		assertEquals("(((-[pm]CL)*[sm]CENTRAL)/[pm]V)",d_central.getAssign().toMathExpression());
+		assertEquals("((((-[pm]CL)*[sm]CENTRAL)/[pm]V)+([pm]KA*CENTRAL))",d_central.getAssign().toMathExpression());
 	}
 
 }
