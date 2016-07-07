@@ -29,9 +29,7 @@ import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
-import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
-import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
-import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
+import eu.ddmore.libpharmml.dom.modeldefn.CommonParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.AbsorptionOralMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.CompartmentMacro;
@@ -100,9 +98,8 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * </ul>
  * 
  * @author Florent Yvon
- * @version 0.1.10
+ * @version 0.2
  */
-@SuppressWarnings("deprecation")
 public class Translator {
 		
 //	private final List<AbstractMacro> model;
@@ -289,10 +286,13 @@ public class Translator {
 	 */
 	public MacroOutput translate(StructuralModel sm, PharmMLVersion version, IndependentVariable t) throws InvalidMacroException{
 		
+		// Instanciating variable and compartment factories used for the translation
 		VariableFactory vf = new VariableFactory(sm);
 		vf.setTimeVariable(t);
 		CompartmentFactory cf = new CompartmentFactory();
 		
+		// Fetching all the macros from the given structural model. The macros can be located in different PKMacroList
+		// elements within the structural model.
 		List<PKMacroList> listOfPKMacroList = new ArrayList<PKMacroList>();
 		for(PharmMLElement smEl : sm.getListOfStructuralModelElements()){
 			if(smEl instanceof PKMacroList){
@@ -300,6 +300,7 @@ public class Translator {
 			}
 		}
 		
+		// Creating high-lvel macro objects from the XML objects
 		List<AbstractMacro> model = parseMacros(listOfPKMacroList,cf,vf);
 		
 		final StructuralModel translated_sm = new StructuralModel();
@@ -312,6 +313,8 @@ public class Translator {
 		
 		final InputList inputList = new InputList();
 		
+		// The modification of ODEs and generation of Inputs from the given macros are executed at the end to
+		// make sure that all ODE left-hand sides have been created before.
 		for(AbstractMacro item : model){
 			if(item instanceof CompartmentTargeter){
 				((CompartmentTargeter) item).modifyTargetODE();
@@ -321,6 +324,7 @@ public class Translator {
 			}
 		}
 		
+		// Now it's time to fetch all the variables created during the process
 		List<CommonVariableDefinition> variables = new ArrayList<CommonVariableDefinition>();
 		if(parameters.get(KEEP_ORDER)){
 			List<AbstractMacro> sorted = sortByIndex(model);
@@ -352,6 +356,8 @@ public class Translator {
 			}
 		}
 		
+		
+		// Now adding them to the new StructuralModel
 		for(CommonVariableDefinition var : variables){
 			if(var instanceof DerivativeVariable){
 				translated_sm.getListOfStructuralModelElements().add((DerivativeVariable) var);
@@ -360,23 +366,23 @@ public class Translator {
 			}
 		}
 		
+		// Adding parameters
 		for(TransientParameter tp : vf.getDefinedParameters()){
+			CommonParameter parameter;
 			if(tp.containsReference()){ // the parameter was already defined, so the reference to the same object is added
-				Object ref = tp.getReference();
-				if (ref instanceof PopulationParameter){
-					translated_sm.getListOfStructuralModelElements().add((PopulationParameter) ref);
-				} else if (ref instanceof IndividualParameter){
-					translated_sm.getListOfStructuralModelElements().add((IndividualParameter) ref);
-				} else if (ref instanceof SimpleParameter){
-					translated_sm.getListOfStructuralModelElements().add((SimpleParameter) ref);
-				}
+				parameter = tp.getReference();
 			} else {
 				if(version.isEqualOrLaterThan(PharmMLVersion.V0_7_3)){
-					translated_sm.getListOfStructuralModelElements().add(tp.toPopulationParameter());
+					if(tp.getType() != null && tp.getType().equals(ParameterType.INDIVIDUAL)){
+						parameter = tp.toIndiviualParameter();
+					} else {
+						parameter = tp.toPopulationParameter();
+					}
 				} else {
-					translated_sm.getListOfStructuralModelElements().add(tp.toSimpleParameter());
+					parameter = tp.toSimpleParameter();
 				}
 			}
+			translated_sm.getListOfStructuralModelElements().add(parameter);
 		}
 		
 		

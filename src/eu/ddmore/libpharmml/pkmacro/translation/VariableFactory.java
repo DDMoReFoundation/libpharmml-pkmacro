@@ -223,8 +223,8 @@ public class VariableFactory {
 		return v;
 	}
 	
-	TransientParameter generateParameter(String prefix){
-		TransientParameter p = new TransientParameter(generateVariableName(prefix));
+	TransientParameter generateParameter(String prefix, ParameterType type){
+		TransientParameter p = new TransientParameter(generateVariableName(prefix),type);
 		try {
 			storeParameter(p);
 		} catch (InvalidMacroException e) {
@@ -262,8 +262,8 @@ public class VariableFactory {
 	 * @param name Name of the parameter. A suffix will be generated to make sure it's unique.
 	 * @return A reference to the created parameter via a {@link SymbolRef} element.
 	 */
-	SymbolRef createAndReferNewParameter(String name){
-		TransientParameter param = generateParameter(name);
+	SymbolRef createAndReferNewParameter(String name,ParameterType type){
+		TransientParameter param = generateParameter(name, type);
 		SymbolRef symbRef = new SymbolRef(param.getSymbolId());
 		return symbRef;
 	}
@@ -275,8 +275,8 @@ public class VariableFactory {
 	 * @param value The initial value of this parameter.
 	 * @return A reference to the created parameter via a {@link SymbolRef} element.
 	 */
-	SymbolRef createAndReferNewParameter(String name, Rhs value){
-		TransientParameter param = generateParameter(name);
+	SymbolRef createAndReferNewParameter(String name, ParameterType type, Rhs value){
+		TransientParameter param = generateParameter(name, type);
 		param.setAssign(value);
 		SymbolRef symbRef = new SymbolRef(param.getSymbolId());
 		return symbRef;

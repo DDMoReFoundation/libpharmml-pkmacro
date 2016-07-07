@@ -96,6 +96,7 @@ import eu.ddmore.libpharmml.util.ChainedList;
  */
 class Absorption extends AbstractCompartment implements CompartmentTargeter, InputSource {
 
+	protected final VariableFactory vf;
 	protected final Scalar adm;
 	protected final Operand Tlag;
 	protected final Operand Tk0;
@@ -140,13 +141,14 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		this.target = target;
 		this.type = type;
 		this.p = p;
+		this.vf = vf;
 		
 		if(type.equals(Type.TRANSIT)){
-			generateTransitODE(vf);
+			generateTransitODE();
 		} else if (type.equals(Type.FIRST_ORDER)) {
-			generateFirstOrderODE(vf);
+			generateFirstOrderODE();
 		} else {
-			generateZeroOrderODE(vf);
+			generateZeroOrderODE();
 		}
 	}
 
@@ -237,7 +239,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		}
 	}
 	
-	protected void generateZeroOrderODE(VariableFactory vf){
+	protected void generateZeroOrderODE(){
 		// Create variables
 		zeroOrderRate = vf.createVariable("ZeroOrderRate", Integer.valueOf(getCmt()));
 		lastDoseAmountToAd = vf.createVariable("LastDoseAmountToAd", Integer.valueOf(getCmt()));
@@ -277,7 +279,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		inputTarget = amount;
 	}
 	
-	protected void generateFirstOrderODE(VariableFactory vf){
+	protected void generateFirstOrderODE(){
 		Uniop uniop = new Uniop();
 		uniop.setOperator(Unioperator.MINUS);
 		Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(amount.getSymbId()));
@@ -286,17 +288,17 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		inputTarget = amount;
 	}
 	
-	protected void generateTransitODE(VariableFactory vf){		
+	protected void generateTransitODE(){		
 		VariableDefinition dose = vf.generateVariable("Dose");
 		SymbolRef doseRef = new SymbolRef(dose.getSymbId());
 		VariableDefinition t_dose = vf.generateVariable("t_Dose");
 		SymbolRef t_doseRef = new SymbolRef(t_dose.getSymbId());
-		SymbolRef n = vf.createAndReferNewParameter("n", new Rhs(new RealValue(5)));
+		SymbolRef n = createN(Ktr, Mtt);
 		Operand f;
 		if(p != null){
 			f = p;
 		} else {
-			f = vf.createAndReferNewParameter("F", new Rhs(new RealValue(1)));
+			f = vf.createAndReferNewParameter("F", ParameterType.INDIVIDUAL, new Rhs(new RealValue(1)));
 		}
 		SymbolRef t = vf.createTimeReference();
 		
@@ -364,6 +366,29 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 				kaAa);
 		amount.assign(rootBinop);
 		inputTarget = dose;
+	}
+	
+//	/**
+//	 * Generates the parameter Ktr (transfer rate) with the assignment Ktr = n+1/Mtt.
+//	 * @param n The number of transit compartment
+//	 * @param Mtt The mean transit time between compartments.
+//	 * @return A {@link SymbolRef} object to the generated parameter.
+//	 */
+//	private SymbolRef createKTR(Operand n,Operand Mtt){
+//		Binop nPlus1 = new Binop(Binoperator.PLUS, n, new RealValue(1));
+//		return vf.createAndReferNewParameter("Ktr", ParameterType.INDIVIDUAL, new Rhs(new Binop(Binoperator.DIVIDE, nPlus1, Mtt)));
+//	}
+	
+	/**
+	 * Creates the parameter "n" (number of transit compartments) with the assignment n = Ktr x Mtt - 1.
+	 * @param ktr The transfer rate
+	 * @param mtt The mean transit time
+	 * @return A {@link SymbolRef} object to the generated parameter "n".
+	 */
+	private SymbolRef createN(Operand ktr,Operand mtt){
+		Binop ktr_x_mtt = new Binop(Binoperator.TIMES, ktr, mtt);
+		Binop ktr_x_mtt_min_1 = new Binop(Binoperator.MINUS, ktr_x_mtt, new RealValue(1));
+		return vf.createAndReferNewParameter("n", ParameterType.INDIVIDUAL, new Rhs(ktr_x_mtt_min_1));
 	}
 
 	@Override

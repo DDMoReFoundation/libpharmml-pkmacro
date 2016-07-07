@@ -39,6 +39,7 @@ import eu.ddmore.libpharmml.dom.maths.FunctionCallType;
 import eu.ddmore.libpharmml.dom.maths.MatrixUniOp;
 import eu.ddmore.libpharmml.dom.maths.Piecewise;
 import eu.ddmore.libpharmml.dom.maths.Uniop;
+import eu.ddmore.libpharmml.dom.modeldefn.CommonParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.Probability;
@@ -58,31 +59,40 @@ class TransientParameter implements Assignable {
 	
 	private final String symbolId;
 	private Rhs assign;
+	private ParameterType type;
 	
 	private SimpleParameter sp;
 	private PopulationParameter pp;
 	private IndividualParameter ip;
 	
-	TransientParameter(String symbolId) {
+	TransientParameter(String symbolId, ParameterType type) {
 		this.symbolId = symbolId;
+		this.type = type;
 	}
 	
 	TransientParameter(SimpleParameter sp){
 		this.sp = sp;
 		symbolId = sp.getId();
+		this.type = null;
 	}
 	
 	TransientParameter(PopulationParameter pp){
 		this.pp = pp;
 		symbolId = pp.getId();
+		this.type = ParameterType.POPULATION;
 	}
 	
 	TransientParameter(IndividualParameter ip){
 		this.ip = ip;
 		symbolId = ip.getId();
+		this.type = ParameterType.INDIVIDUAL;
 	}
 	
-	public Object getReference(){
+	/**
+	 * Gets the initial parameter which this transient instance was built on.
+	 * @return The {@link CommonParameter} reference object used to build this transient parameter.
+	 */
+	public CommonParameter getReference(){
 		if(sp != null){
 			return sp;
 		} else if(pp != null) {
@@ -94,6 +104,10 @@ class TransientParameter implements Assignable {
 		}
 	}
 	
+	/**
+	 * Checks if this transient parameter was built on an existing PharmML parameter.
+	 * @return true if this instance contains an existing PharmML object.
+	 */
 	boolean containsReference(){
 		return (sp != null || pp != null || ip != null);
 	}
@@ -110,6 +124,15 @@ class TransientParameter implements Assignable {
 		return assign;
 	}
 	
+	public ParameterType getType(){
+		return type;
+	}
+	
+	/**
+	 * Creates a new {@link SimpleParameter} from this transient instance. This method sould be used only for
+	 * models encoded in old versions prior to 0.7.
+	 * @return A new {@link SimpleParameter}.
+	 */
 	SimpleParameter toSimpleParameter(){
 		SimpleParameter sp = new SimpleParameter();
 		sp.setSymbId(symbolId);
@@ -117,11 +140,26 @@ class TransientParameter implements Assignable {
 		return sp;
 	}
 	
+	/**
+	 * Creates a new {@link PopulationParameter} from this transient instance.
+	 * @return A new {@link PopulationParameter}.
+	 */
 	PopulationParameter toPopulationParameter(){
 		PopulationParameter pp = new PopulationParameter();
 		pp.setSymbId(symbolId);
 		pp.setAssign(assign);
 		return pp;
+	}
+	
+	/**
+	 * Creates a new {@link IndividualParameter} from this transient instance.
+	 * @return A new {@link IndividualParameter}.
+	 */
+	IndividualParameter toIndiviualParameter(){
+		IndividualParameter ip = new IndividualParameter();
+		ip.setSymbId(symbolId);
+		ip.setAssign(assign);
+		return ip;
 	}
 	
 	@Override
