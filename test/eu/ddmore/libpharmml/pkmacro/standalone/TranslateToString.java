@@ -2,6 +2,7 @@ package eu.ddmore.libpharmml.pkmacro.standalone;
 
 import java.io.FileInputStream;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.tree.TreeNode;
 import javax.xml.bind.JAXBContext;
@@ -25,6 +26,7 @@ import eu.ddmore.libpharmml.impl.IdFactoryImpl;
 import eu.ddmore.libpharmml.impl.MarshalListener;
 import eu.ddmore.libpharmml.impl.PharmMLVersion;
 import eu.ddmore.libpharmml.impl.XMLFilter;
+import eu.ddmore.libpharmml.pkmacro.translation.Input;
 import eu.ddmore.libpharmml.pkmacro.translation.MacroOutput;
 import eu.ddmore.libpharmml.pkmacro.translation.Translator;
 import eu.ddmore.libpharmml.pkmacro.translation.Utils;
@@ -54,6 +56,9 @@ public class TranslateToString {
 		System.out.println("Variables:");
 		printStructuralModel(tl_sm);
 		
+		System.out.println("Inputs:");
+		printInputs(output.getListOfInput());
+		
 		JAXBContext context = JAXBContext.newInstance("eu.ddmore.libpharmml.dom:eu.ddmore.libpharmml.dom.uncertml");
 		Marshaller m = context.createMarshaller();
 		setMarshalVersion(tl_sm, PharmMLVersion.DEFAULT);
@@ -66,6 +71,13 @@ public class TranslateToString {
 					
 	}
 	
+	private static void printInputs(List<Input> listOfInput) {
+		for(Input input : listOfInput){
+			println(input.toString());
+		}
+		println("------------------------------------");
+	}
+
 	private static void printStructuralModel(StructuralModel sm) {
 		for(PharmMLElement var : sm.getListOfStructuralModelElements()){
 			if(var instanceof VariableDefinition){
