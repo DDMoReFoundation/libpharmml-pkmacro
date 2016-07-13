@@ -79,7 +79,7 @@ class Transfer extends AbstractMacro implements CompartmentTargeter{
 	}
 
 	static Transfer fromMacro(CompartmentFactory cf, VariableFactory vf, TransferMacro macro) throws InvalidMacroException {
-		ParamResolver pr = new ParamResolver(macro);
+		ParamMapper pr = new ParamMapper(macro);
 		
 		AbstractCompartment from = cf.getCompartment(pr.getValue("from",IntValue.class).getValue().intValue());
 		AbstractCompartment to = cf.getCompartment(pr.getValue("to",IntValue.class).getValue().intValue());

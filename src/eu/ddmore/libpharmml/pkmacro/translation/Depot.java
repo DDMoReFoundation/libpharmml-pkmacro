@@ -80,7 +80,7 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 	}
 	
 	static Depot fromMacro(CompartmentFactory cf, VariableFactory vf, DepotMacro macro) throws InvalidMacroException{
-		ParamResolver pr = new ParamResolver(macro);
+		ParamMapper pr = new ParamMapper(macro);
 		
 		SymbolRef targetRef = pr.getValue(DepotMacro.Arg.TARGET, SymbolRef.class);
 		DerivativeVariable target = AbstractCompartment.resolveDerivativeVariable(vf, targetRef);

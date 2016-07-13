@@ -153,7 +153,7 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 	}
 
 	static Absorption fromMacro(CompartmentFactory cf, VariableFactory vf, AbsorptionOralMacro macro) throws InvalidMacroException{
-		ParamResolver pr = new ParamResolver(macro);
+		ParamMapper pr = new ParamMapper(macro);
 		
 		Scalar adm;
 		if(pr.contains(AbsorptionOralMacro.Arg.TYPE)){

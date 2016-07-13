@@ -62,7 +62,7 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 	private final AbstractCompartment target;
 	
 	static Peripheral fromMacro(CompartmentFactory cf, VariableFactory vf, PeripheralMacro macro) throws InvalidMacroException{
-		ParamResolver resolver = new ParamResolver(macro);
+		ParamMapper resolver = new ParamMapper(macro);
 		
 		// Looking for transfer rates
 		Integer periphCmt = null;

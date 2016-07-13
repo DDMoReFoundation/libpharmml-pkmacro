@@ -27,11 +27,28 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 /**
- * Class for helping to fetch paramaters in macros
+ * Class for helping with fetching paramaters in PK macros.
+ * 
+ * <p>This class takes a given {@link PKMacro} object as a parameter in the constructor. Then any argument value can be retrieved
+ * via the methods {@link #getValue(String)} or {@link #getValue(String, Class)}. Before calling those methods, one can use the method
+ * {@link #contains(String)} to make sure that the parameter exists, otherwise an {@link InvalidMacroException} may be thrown.
+ * 
+ * <p><pre>Usage:
+ * 
+ * <code>
+ * ParamMapper mapper = new ParamMapper((CompartmentMacro) macro));
+ * if(mapper.contains("cmt")){
+ * 		Rhs rhs = mapper.getValue("cmt");
+ * 		// Parsing the content of the rhs
+ * 		rhs.visit(rhsVisitor);
+ * }
+ * </code>
+ * 
+ * </pre>
  *
  * @author Florent Yvon
  */
-class ParamResolver {
+public class ParamMapper {
 	
 	private final Map<String,Rhs> data;
 	private final String macroName;
@@ -41,7 +58,7 @@ class ParamResolver {
 	 * @param macro A XML macro object.
 	 * @throws InvalidMacroException If one of the parameters is invalid.
 	 */
-	ParamResolver(PKMacro macro) throws InvalidMacroException {
+	public ParamMapper(PKMacro macro) throws InvalidMacroException {
 		data = new Hashtable<String,Rhs>();
 		for(MacroValue value : macro.getListOfValue()){
 			if(value.getArgument() != null){
@@ -62,12 +79,12 @@ class ParamResolver {
 	}
 	
 	/**
-	 * Returns the value of the given parameter.
+	 * Returns the value of the given parameter. One might use the method {@link #contains(String)} before this one.
 	 * @param argument Name of the argument
 	 * @return The value of the wanted parameter wrapped in a {@link Rhs} element.
 	 * @throws InvalidMacroException If the given argument is not defined for the provided macro.
 	 */
-	Rhs getValue(String argument) throws InvalidMacroException{
+	public Rhs getValue(String argument) throws InvalidMacroException{
 		if(!data.containsKey(argument) || data.get(argument) == null){
 			throw new InvalidMacroException("Argument \""+argument+"\" is undefined in \""+macroName+"\".");
 		}
@@ -75,16 +92,16 @@ class ParamResolver {
 	}
 	
 	/**
-	 * This method gets the value of a parameter with assumption of its type. If the parameter is
-	 * assigned to an equation, the assumption will be on the content of the equation, and that content
-	 * returned.
+	 * This method gets the value of a parameter with assumption of its type. This method does not return
+	 * the {@link Rhs} object but its content. If the parameter is assigned to an equation, the assumption 
+	 * will be on the content of the equation, and that content returned.
 	 * @param argument Name of the parameter.
-	 * @param _class The expect type of the parameter.
+	 * @param _class The expect type of the parameter. Potentially any possible type returned by {@link Rhs#getContent()}.
 	 * @return The value of the parameter casted to the expected type.
 	 * @throws InvalidMacroException If the parameter does not exist or if the type is not the expected one.
 	 */
 	@SuppressWarnings("unchecked")
-	<T> T getValue(String argument, Class<T> _class) throws InvalidMacroException{
+	public <T> T getValue(String argument, Class<T> _class) throws InvalidMacroException{
 		Rhs rhs_value = getValue(argument);
 		Object rhs_content = rhs_value.getContent();
 		// Equation not used anymore
@@ -116,7 +133,7 @@ class ParamResolver {
 	 * @param argument Argument name
 	 * @return true if found, else false.
 	 */
-	boolean contains(String argument){
+	public boolean contains(String argument){
 		return data.containsKey(argument);
 	}
 	

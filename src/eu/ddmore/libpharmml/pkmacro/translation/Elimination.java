@@ -93,7 +93,7 @@ class Elimination extends AbstractMacro implements CompartmentTargeter {
 	}
 	
 	static Elimination fromMacro(CompartmentFactory cf, VariableFactory vf, EliminationMacro macro) throws InvalidMacroException{
-		ParamResolver resolver = new ParamResolver(macro);
+		ParamMapper resolver = new ParamMapper(macro);
 		
 		AbstractCompartment target = cf.getCompartment(resolver.getValue("cmt",IntValue.class).getValue().intValue());
 		

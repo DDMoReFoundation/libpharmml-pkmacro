@@ -45,7 +45,7 @@ class Compartment extends AbstractCompartment {
 	 * @throws InvalidMacroException If the given PharmML macro is incorrect or cannot be translated.
 	 */
 	static Compartment fromMacro(CompartmentFactory cf, VariableFactory vf, CompartmentMacro macro) throws InvalidMacroException{
-		ParamResolver resolver = new ParamResolver(macro);
+		ParamMapper resolver = new ParamMapper(macro);
 		
 		// Required parameters
 		Integer cmt = resolver.getValue("cmt",IntValue.class).getValue().intValue();

@@ -75,7 +75,7 @@ class Effect extends AbstractCompartment {
 	}
 	
 	static Effect fromMacro(CompartmentFactory cf, VariableFactory vf, EffectMacro macro) throws InvalidMacroException{
-		ParamResolver pr = new ParamResolver(macro);
+		ParamMapper pr = new ParamMapper(macro);
 		
 		SymbolRef concentrationRef = pr.getValue(EffectMacro.Arg.CONCENTRATION, SymbolRef.class);
 //		DerivativeVariable concentration = tl.getVariableFactory().generateDerivativeVariable(

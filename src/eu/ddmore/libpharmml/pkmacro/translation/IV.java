@@ -49,7 +49,7 @@ class IV extends AbstractMacro implements InputSource {
 	}
 	
 	static IV fromMacro(CompartmentFactory cf, VariableFactory vf, IVMacro macro) throws InvalidMacroException{
-		ParamResolver pr = new ParamResolver(macro);
+		ParamMapper pr = new ParamMapper(macro);
 		
 		Scalar adm;
 		if(pr.contains("type")){
