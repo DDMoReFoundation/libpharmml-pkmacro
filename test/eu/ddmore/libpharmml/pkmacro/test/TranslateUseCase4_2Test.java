@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.io.FileInputStream;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +23,8 @@ import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.ModelDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
 import eu.ddmore.libpharmml.impl.PharmMLVersion;
+import eu.ddmore.libpharmml.pkmacro.translation.Input;
+import eu.ddmore.libpharmml.pkmacro.translation.InputType;
 import eu.ddmore.libpharmml.pkmacro.translation.MacroOutput;
 import eu.ddmore.libpharmml.pkmacro.translation.Translator;
 
@@ -84,6 +87,21 @@ public class TranslateUseCase4_2Test {
 		assertEquals("CENTRAL", d_central.getSymbId());
 		assertNotNull(d_central.getAssign());
 		assertEquals("((((-[pm]CL)*[sm]CENTRAL)/[pm]V)+([pm]KA*CENTRAL))",d_central.getAssign().toMathExpression());
+		
+		List<Input> inputs = output.getListOfInput();
+		assertEquals("2 inputs",2,inputs.size());
+		// Input[1]
+		Input input1 = inputs.get(0);
+		assertEquals(1, input1.getNumber());
+		assertEquals(InputType.ORAL, input1.getType());
+		assertEquals("1", input1.getAdm().valueToString());
+		assertEquals("Ad1", input1.getTarget().getSymbId());
+		// Input[2]
+		Input input2 = inputs.get(1);
+		assertEquals(2, input2.getNumber());
+		assertEquals(InputType.IV, input2.getType());
+		assertEquals("2", input2.getAdm().valueToString());
+		assertEquals("CENTRAL", input2.getTarget().getSymbId());
 	}
 
 }
