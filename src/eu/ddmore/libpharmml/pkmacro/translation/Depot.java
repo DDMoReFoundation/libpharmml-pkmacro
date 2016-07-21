@@ -72,14 +72,18 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 	protected final DerivativeVariable target;
 	protected final Scalar adm;
 	protected final Operand ka;
+	protected final Operand tlag;
+	protected final Operand p;
 	// When using ka, an oral macro is created. This reference is used to generated the inputs
 	protected final Absorption absorption;
 	
-	private Depot(Scalar adm, DerivativeVariable target, Operand ka, Absorption absorption){
+	private Depot(Scalar adm, DerivativeVariable target, Operand ka, Operand tlag, Operand p, Absorption absorption){
 		this.adm = adm;
 		this.target = target;
 		this.ka = ka;
 		this.absorption = absorption;
+		this.tlag = tlag;
+		this.p = p;
 	}
 	
 	static Depot fromMacro(CompartmentFactory cf, VariableFactory vf, DepotMacro macro) throws InvalidMacroException{
@@ -91,7 +95,21 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 		Scalar adm = pr.getValue(DepotMacro.Arg.ADM, Scalar.class);
 		
 		Operand ka;
+		Operand tlag;
+		Operand p;
 		Absorption absorption;
+		
+		if(pr.contains(DepotMacro.Arg.TLAG)){
+			tlag = pr.getValue(DepotMacro.Arg.TLAG, Operand.class);
+		} else {
+			tlag = null;
+		}
+		
+		if(pr.contains(DepotMacro.Arg.P)){
+			p = pr.getValue(DepotMacro.Arg.P, Operand.class);
+		} else {
+			p = null;
+		}
 		
 		if(pr.contains(DepotMacro.Arg.KA)){
 			ka = pr.getValue(DepotMacro.Arg.KA, Operand.class);
@@ -103,7 +121,7 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 			
 			DerivativeVariable depot_variable = vf.generateDerivativeVariable(VariableFactory.DEPOT_PREFIX);
 			absorption = new Absorption(
-					adm, null, null, ka, null, null, null, comp, Absorption.Type.FIRST_ORDER, 
+					adm, tlag, null, ka, null, null, p, comp, Absorption.Type.FIRST_ORDER, 
 					cf.lowestAvailableId(), depot_variable, vf);
 			cf.addCompartment(absorption);
 		} else {
@@ -111,7 +129,7 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 			absorption = null;
 		}
 		
-		return new Depot(adm, target, ka, absorption);
+		return new Depot(adm, target, ka, tlag, p, absorption);
 	}
 
 	@Override
@@ -119,7 +137,7 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 		if(absorption != null){
 			absorption.generateInputs(inputList);
 		} else {
-			inputList.createInput(InputType.IV, adm, target);
+			inputList.createInput(InputType.IV, adm, target, tlag, p);
 		}
 	}
 

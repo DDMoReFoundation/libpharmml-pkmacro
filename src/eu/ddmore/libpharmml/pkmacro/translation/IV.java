@@ -24,6 +24,7 @@ import java.util.List;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
+import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.IVMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
@@ -41,11 +42,15 @@ class IV extends AbstractMacro implements InputSource {
 	
 	protected final AbstractCompartment target;
 	protected final Scalar adm;
+	protected final Operand tlag;
+	protected final Operand p;
 	
-	protected IV(AbstractCompartment target, Scalar adm) {
+	protected IV(AbstractCompartment target, Scalar adm, Operand tlag, Operand p) {
 		super();
 		this.target = target;
 		this.adm = adm;
+		this.tlag = tlag;
+		this.p = p;
 	}
 	
 	static IV fromMacro(CompartmentFactory cf, VariableFactory vf, IVMacro macro) throws InvalidMacroException{
@@ -58,14 +63,28 @@ class IV extends AbstractMacro implements InputSource {
 			adm = pr.getValue("adm", Scalar.class);
 		}
 		
+		Operand tlag;
+		if(pr.contains(IVMacro.Arg.TLAG)){
+			tlag = pr.getValue(IVMacro.Arg.TLAG, Operand.class);
+		} else {
+			tlag = null;
+		}
+		
+		Operand p;
+		if(pr.contains(IVMacro.Arg.P)){
+			p = pr.getValue(IVMacro.Arg.P, Operand.class);
+		} else {
+			p = null;
+		}
+		
 		AbstractCompartment target = cf.getCompartment(pr.getValue("cmt",IntValue.class).getValue().intValue());
 		
-		return new IV(target, adm);
+		return new IV(target, adm, tlag, p);
 	}
 
 	@Override
 	public void generateInputs(InputList inputList) {		
-		inputList.createInput(InputType.IV, adm, target.getAmount());
+		inputList.createInput(InputType.IV, adm, target.getAmount(), tlag, p);
 	}
 
 	@Override

@@ -22,6 +22,10 @@ import eu.ddmore.libpharmml.dom.commontypes.PharmMLElement;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.ModelDefinition;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.DepotMacro;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.MacroValue;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacroList;
 import eu.ddmore.libpharmml.impl.PharmMLVersion;
 import eu.ddmore.libpharmml.pkmacro.translation.Input;
 import eu.ddmore.libpharmml.pkmacro.translation.InputType;
@@ -62,6 +66,20 @@ public class TranslateUseCase4_2Test {
 	@Test
 	public void testTranslate() throws Exception {
 		StructuralModel sm = fetchStructuralModel(inputModel);
+		
+		PKMacroList macros = (PKMacroList) sm.getListOfStructuralModelElements().get(2);
+		PKMacro depot1 = macros.getListOfMacro().get(0);
+		Object tlag = null;
+		Object p = null;
+		for(MacroValue value : depot1.getListOfValue()){
+			if(value.getArgument().equals(DepotMacro.Arg.TLAG.toString())){
+				tlag = value.getAssign().getContent();
+			}
+			if(value.getArgument().equals(DepotMacro.Arg.P.toString())){
+				p = value.getAssign().getContent();
+			}
+		}
+		
 		MacroOutput output = translator.translate(sm, PharmMLVersion.DEFAULT,time);
 		
 		StructuralModel tl_sm = output.getStructuralModel();
@@ -96,6 +114,10 @@ public class TranslateUseCase4_2Test {
 		assertEquals(InputType.ORAL, input1.getType());
 		assertEquals("1", input1.getAdm().valueToString());
 		assertEquals("Ad1", input1.getTarget().getSymbId());
+		assertNotNull(input1.getTlag());
+		assertEquals(tlag, input1.getTlag());
+		assertNotNull(input1.getP());
+		assertEquals(p, input1.getP());
 		// Input[2]
 		Input input2 = inputs.get(1);
 		assertEquals(2, input2.getNumber());
