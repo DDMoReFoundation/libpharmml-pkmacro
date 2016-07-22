@@ -196,13 +196,13 @@ class Absorption extends AbstractCompartment implements CompartmentTargeter, Inp
 		DerivativeVariable amount;
 		if(Tk0 != null){
 			type = Type.ZERO_ORDER;
-			amount = vf.createDerivativeVariable(VariableFactory.DEPOT_PREFIX, cmt);
+			amount = vf.createDerivativeVariable(VariableFactory.DEPOT_PREFIX, cmt, macro);
 		} else if(ka != null && (Ktr == null || Mtt == null)){
 			type = Type.FIRST_ORDER;
-			amount = vf.createDerivativeVariable(VariableFactory.DEPOT_PREFIX, cmt);
+			amount = vf.createDerivativeVariable(VariableFactory.DEPOT_PREFIX, cmt, macro);
 		} else if(Ktr != null && Mtt != null){
 			type = Type.TRANSIT;
-			amount = vf.createDerivativeVariable(VariableFactory.ABSORPTION_PREFIX, cmt);
+			amount = vf.createDerivativeVariable(VariableFactory.ABSORPTION_PREFIX, cmt, macro);
 		} else {
 			throw new InvalidMacroException("Absorption/Oral macro must have the following prameters: "
 					+ "Tk0, ka or [Ktr and Mtt]");

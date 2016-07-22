@@ -106,9 +106,9 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 		DerivativeVariable amount;
 		if(resolver.contains(PeripheralMacro.Arg.AMOUNT)){
 			SymbolRef amountRef = resolver.getValue("amount", SymbolRef.class);
-			amount = resolveDerivativeVariable(vf, amountRef);
+			amount = resolveDerivativeVariable(vf, amountRef, macro);
 		} else {
-			amount = vf.createDerivativeVariable(VariableFactory.PERIPH_CMT_PREFIX, periphCmt);
+			amount = vf.createDerivativeVariable(VariableFactory.PERIPH_CMT_PREFIX, periphCmt, macro);
 		}
 		
 		AbstractCompartment central = cf.getCompartment(centralCmt);

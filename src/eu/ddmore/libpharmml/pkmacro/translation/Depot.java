@@ -90,7 +90,7 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 		ParamMapper pr = new ParamMapper(macro);
 		
 		SymbolRef targetRef = pr.getValue(DepotMacro.Arg.TARGET, SymbolRef.class);
-		DerivativeVariable target = AbstractCompartment.resolveDerivativeVariable(vf, targetRef);
+		DerivativeVariable target = AbstractCompartment.resolveDerivativeVariable(vf, targetRef, macro);
 		
 		Scalar adm = pr.getValue(DepotMacro.Arg.ADM, Scalar.class);
 		
@@ -119,7 +119,7 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 			Compartment comp = new Compartment(cf.lowestAvailableId(), target, null, null);
 			cf.addCompartment(comp);
 			
-			DerivativeVariable depot_variable = vf.generateDerivativeVariable(VariableFactory.DEPOT_PREFIX);
+			DerivativeVariable depot_variable = vf.generateDerivativeVariable(VariableFactory.DEPOT_PREFIX, macro);
 			absorption = new Absorption(
 					adm, tlag, null, ka, null, null, p, comp, Absorption.Type.FIRST_ORDER, 
 					cf.lowestAvailableId(), depot_variable, vf);

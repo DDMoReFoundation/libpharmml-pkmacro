@@ -80,7 +80,7 @@ class Effect extends AbstractCompartment {
 		SymbolRef concentrationRef = pr.getValue(EffectMacro.Arg.CONCENTRATION, SymbolRef.class);
 //		DerivativeVariable concentration = tl.getVariableFactory().generateDerivativeVariable(
 //				concentrationRef.getSymbIdRef());
-		DerivativeVariable concentration = resolveDerivativeVariable(vf, concentrationRef);
+		DerivativeVariable concentration = resolveDerivativeVariable(vf, concentrationRef, macro);
 		
 		Integer targetCmt = pr.getValue("cmt",IntValue.class).getValue().intValue();
 		AbstractCompartment target = cf.getCompartment(targetCmt);

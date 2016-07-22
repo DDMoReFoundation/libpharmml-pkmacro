@@ -39,6 +39,7 @@ import eu.ddmore.libpharmml.dom.modeldefn.IndividualParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.PopulationParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.SimpleParameter;
 import eu.ddmore.libpharmml.dom.modeldefn.StructuralModel;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 import eu.ddmore.libpharmml.impl.LoggerWrapper;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
@@ -168,13 +169,17 @@ public class VariableFactory {
 	 * @param index
 	 * @return The new {@link DerivativeVariable} instance.
 	 */
-	DerivativeVariable createDerivativeVariable(String prefix, Integer index){
+	DerivativeVariable createDerivativeVariable(String prefix, Integer index, PKMacro origin){
 		if(variableExists(prefix+index)){
-			return generateDerivativeVariable(prefix);
+			return generateDerivativeVariable(prefix,origin);
 		} else {
 			DerivativeVariable dv = new DerivativeVariable();
 			dv.setSymbId(prefix+index);
 			dv.setSymbolType(SymbolType.REAL);
+			if(origin != null){
+				dv.setOriginatedFromMacro(true);
+				dv.setOriginMacro(origin);
+			}
 			try {
 				storeVariable(dv);
 			} catch (InvalidMacroException e) {
@@ -191,10 +196,14 @@ public class VariableFactory {
 	 * @param prefix A symbId prefix, like Ac, Ap...
 	 * @return A new {@link DerivativeVariable}.
 	 */
-	DerivativeVariable generateDerivativeVariable(String prefix){
+	DerivativeVariable generateDerivativeVariable(String prefix, PKMacro origin){
 		DerivativeVariable dv = new DerivativeVariable();
 		dv.setSymbId(generateVariableName(prefix));
 		dv.setSymbolType(SymbolType.REAL);
+		if(origin != null){
+			dv.setOriginatedFromMacro(true);
+			dv.setOriginMacro(origin);
+		}
 		try {
 			storeVariable(dv);
 		} catch (InvalidMacroException e) {

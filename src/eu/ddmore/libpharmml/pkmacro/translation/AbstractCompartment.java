@@ -25,6 +25,7 @@ import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 import eu.ddmore.libpharmml.dom.maths.Operand;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 import eu.ddmore.libpharmml.impl.LoggerWrapper;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 import eu.ddmore.libpharmml.util.ChainedList;
@@ -74,7 +75,7 @@ abstract class AbstractCompartment extends AbstractMacro {
 	 * @return The referred {@link DerivativeVariable} that was found or created.
 	 * @throws InvalidMacroException If the provided {@link SymbolRef} doesn't have a valid symbIdRef.
 	 */
-	protected static DerivativeVariable resolveDerivativeVariable(VariableFactory vf, SymbolRef sref) throws InvalidMacroException{
+	protected static DerivativeVariable resolveDerivativeVariable(VariableFactory vf, SymbolRef sref, PKMacro origin) throws InvalidMacroException{
 		String symbId = sref.getSymbIdRef();
 		DerivativeVariable dv;
 		if(symbId == null){
@@ -89,7 +90,7 @@ abstract class AbstractCompartment extends AbstractMacro {
 					dv = vf.transformToDerivativeVariable(var);
 				} else {
 					LoggerWrapper.getLogger().info("New derivative variable \""+symbId+"\".");
-					dv = vf.generateDerivativeVariable(symbId);
+					dv = vf.generateDerivativeVariable(symbId, origin);
 				}				
 			}
 		}

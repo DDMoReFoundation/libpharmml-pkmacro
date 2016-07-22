@@ -50,7 +50,7 @@ class Compartment extends AbstractCompartment {
 		// Required parameters
 		Integer cmt = resolver.getValue("cmt",IntValue.class).getValue().intValue();
 		SymbolRef s = resolver.getValue("amount", SymbolRef.class);
-		DerivativeVariable dv = resolveDerivativeVariable(vf, s);
+		DerivativeVariable dv = resolveDerivativeVariable(vf, s, macro);
 		
 		// Optionals
 		Operand volume;
