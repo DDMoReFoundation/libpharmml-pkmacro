@@ -32,7 +32,7 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
  */
 public abstract class AbstractMacro {
 	
-	private int index = -1;
+	private Integer index = -1;
 	
 	private PKMacro origin = null;
 	
@@ -40,7 +40,7 @@ public abstract class AbstractMacro {
 	 * Position of the macro as it is read in the input PharmML model.
 	 * @return The index starting from 0. Returns -1 if the order has not been saved.
 	 */
-	public int getIndex(){
+	public Integer getIndex(){
 		return index;
 	}
 	
@@ -48,7 +48,7 @@ public abstract class AbstractMacro {
 	 * Sets the position of the input xml macro to keep track of it.
 	 * @param index The current position of the untranslated macro.
 	 */
-	void setIndex(int index){
+	void setIndex(Integer index){
 		this.index = index;
 	}
 	

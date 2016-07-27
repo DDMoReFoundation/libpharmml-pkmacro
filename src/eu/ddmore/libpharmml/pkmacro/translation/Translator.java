@@ -19,6 +19,8 @@
 package eu.ddmore.libpharmml.pkmacro.translation;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -246,15 +248,28 @@ public class Translator {
 		}
 	}
 	
+	/**
+	 * Creates a new list of macro objects, sorted by their index.
+	 * @param unsorted The initial unsorted list.
+	 * @return A copy of the given list, sorted by index.
+	 */
 	private static List<AbstractMacro> sortByIndex(List<AbstractMacro> unsorted){
-		List<AbstractMacro> sorted = new ArrayList<AbstractMacro>(unsorted.size());
-		while(sorted.size() < unsorted.size()){
-			sorted.add(null);
-		}
-		for(AbstractMacro macro : unsorted){
-			sorted.set(macro.getIndex(), macro);
-		}
+		List<AbstractMacro> sorted = new ArrayList<AbstractMacro>();
+		sorted.addAll(unsorted);
+		Collections.sort(sorted, new MacroComparator());
 		return sorted;
+	}
+	
+	/**
+	 * Comparator for macro objects using their index as criterion.
+	 */
+	private static class MacroComparator implements Comparator<AbstractMacro> {
+
+		@Override
+		public int compare(AbstractMacro o1, AbstractMacro o2) {
+			return o1.getIndex().compareTo(o2.getIndex());
+		}
+		
 	}
 	
 	/**
