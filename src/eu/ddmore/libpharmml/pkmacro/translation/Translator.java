@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
@@ -152,7 +151,7 @@ public class Translator {
 	 * Equations are added by each fromMacro() method execution.
 	 * @throws InvalidMacroException
 	 */
-	private List<AbstractMacro> parseMacros(PKMacroList PKMacroList, CompartmentFactory cf, VariableFactory vf, AtomicInteger compartmentIndex) throws InvalidMacroException{
+	private List<AbstractMacro> parseMacros(PKMacroList PKMacroList, CompartmentFactory cf, VariableFactory vf, Integer compartmentIndex) throws InvalidMacroException{
 		
 		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
 		List<PKMacro> list = PKMacroList.getListOfMacro();
@@ -162,13 +161,13 @@ public class Translator {
 			PKMacro xmlMacro = list.get(i);
 			if(xmlMacro instanceof CompartmentMacro){
 				Compartment macro = Compartment.fromMacro(cf, vf, (CompartmentMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof PeripheralMacro){
 				Peripheral macro = Peripheral.fromMacro(cf, vf, (PeripheralMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
@@ -179,37 +178,37 @@ public class Translator {
 			PKMacro xmlMacro = list.get(i);
 			if(xmlMacro instanceof AbsorptionOralMacro){
 				Absorption macro = Absorption.fromMacro(cf, vf, (AbsorptionOralMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof IVMacro){
 				IV macro = IV.fromMacro(cf, vf, (IVMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof TransferMacro){
 				Transfer macro = Transfer.fromMacro(cf, vf, (TransferMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof EliminationMacro){
 				Elimination macro = Elimination.fromMacro(cf, vf, (EliminationMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof EffectMacro){
 				Effect macro = Effect.fromMacro(cf, vf, (EffectMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof DepotMacro){
 				Depot macro = Depot.fromMacro(cf, vf, (DepotMacro) xmlMacro);
-				macro.setIndex(i);
+				macro.setIndex(i + compartmentIndex);
 				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
@@ -312,10 +311,12 @@ public class Translator {
 		
 		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
 		
-		AtomicInteger compartmentIndex = new AtomicInteger(0);
+		Integer compartmentIndex = 0;
 		for(PharmMLElement smEl : sm.getListOfStructuralModelElements()){
 			if(smEl instanceof PKMacroList){
-				model.addAll(parseMacros((PKMacroList) smEl, cf, vf, compartmentIndex));
+				List<AbstractMacro> macroSublist = parseMacros((PKMacroList) smEl, cf, vf, compartmentIndex);
+				model.addAll(macroSublist);
+				compartmentIndex += macroSublist.size();
 			}
 		}
 		
