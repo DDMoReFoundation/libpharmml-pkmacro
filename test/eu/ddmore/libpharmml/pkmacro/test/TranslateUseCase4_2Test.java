@@ -87,12 +87,12 @@ public class TranslateUseCase4_2Test {
 		PharmMLElement var1 = tl_sm.getListOfStructuralModelElements().get(0);
 		PharmMLElement var2 = tl_sm.getListOfStructuralModelElements().get(1);
 		PharmMLElement var3 = tl_sm.getListOfStructuralModelElements().get(2);
-		assertThat(var1, instanceOf(DerivativeVariable.class));
-		DerivativeVariable d_ad = (DerivativeVariable) var1;
-		assertThat(var2, instanceOf(VariableDefinition.class));
-		VariableDefinition cc = (VariableDefinition) var2;
+		assertThat(var2, instanceOf(DerivativeVariable.class));
+		DerivativeVariable d_central = (DerivativeVariable) var2;
+		assertThat(var1, instanceOf(VariableDefinition.class));
+		VariableDefinition cc = (VariableDefinition) var1;
 		assertThat(var3, instanceOf(DerivativeVariable.class));
-		DerivativeVariable d_central = (DerivativeVariable) var3;
+		DerivativeVariable d_ad = (DerivativeVariable) var3;
 		
 		assertEquals("Ad1", d_ad.getSymbId());
 		assertNotNull(d_ad.getAssign());

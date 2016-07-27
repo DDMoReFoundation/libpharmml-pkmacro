@@ -20,8 +20,11 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
@@ -102,10 +105,6 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  */
 public class Translator {
 		
-//	private final List<AbstractMacro> model;
-	
-//	private final VariableFactory variableFactory;
-	
 	/**
 	 * The blkID value used for the output {@link StructuralModel} if the option {@link #KEEP_BLOCK_ID} is set to false.
 	 */
@@ -151,13 +150,10 @@ public class Translator {
 	 * Equations are added by each fromMacro() method execution.
 	 * @throws InvalidMacroException
 	 */
-	private List<AbstractMacro> parseMacros(List<PKMacroList> listOfPKMacroList, CompartmentFactory cf, VariableFactory vf) throws InvalidMacroException{
+	private List<AbstractMacro> parseMacros(PKMacroList PKMacroList, CompartmentFactory cf, VariableFactory vf, AtomicInteger compartmentIndex) throws InvalidMacroException{
 		
 		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
-		List<PKMacro> list = new ArrayList<PKMacro>();
-		for(PKMacroList pkMacroList : listOfPKMacroList){
-			list.addAll(pkMacroList.getListOfMacro());
-		}
+		List<PKMacro> list = PKMacroList.getListOfMacro();
 		
 		// Core macros
 		for(int i = 0;i<list.size();i++){
@@ -165,11 +161,13 @@ public class Translator {
 			if(xmlMacro instanceof CompartmentMacro){
 				Compartment macro = Compartment.fromMacro(cf, vf, (CompartmentMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof PeripheralMacro){
 				Peripheral macro = Peripheral.fromMacro(cf, vf, (PeripheralMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 		}
@@ -180,31 +178,37 @@ public class Translator {
 			if(xmlMacro instanceof AbsorptionOralMacro){
 				Absorption macro = Absorption.fromMacro(cf, vf, (AbsorptionOralMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof IVMacro){
 				IV macro = IV.fromMacro(cf, vf, (IVMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof TransferMacro){
 				Transfer macro = Transfer.fromMacro(cf, vf, (TransferMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof EliminationMacro){
 				Elimination macro = Elimination.fromMacro(cf, vf, (EliminationMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof EffectMacro){
 				Effect macro = Effect.fromMacro(cf, vf, (EffectMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 			else if(xmlMacro instanceof DepotMacro){
 				Depot macro = Depot.fromMacro(cf, vf, (DepotMacro) xmlMacro);
 				macro.setIndex(i);
+				macro.setOrigin(xmlMacro);
 				model.add(macro);
 			}
 		}
@@ -291,17 +295,14 @@ public class Translator {
 		vf.setTimeVariable(t);
 		CompartmentFactory cf = new CompartmentFactory();
 		
-		// Fetching all the macros from the given structural model. The macros can be located in different PKMacroList
-		// elements within the structural model.
-		List<PKMacroList> listOfPKMacroList = new ArrayList<PKMacroList>();
+		List<AbstractMacro> model = new ArrayList<AbstractMacro>();
+		
+		AtomicInteger compartmentIndex = new AtomicInteger(0);
 		for(PharmMLElement smEl : sm.getListOfStructuralModelElements()){
 			if(smEl instanceof PKMacroList){
-				listOfPKMacroList.add((PKMacroList) smEl);
+				model.addAll(parseMacros((PKMacroList) smEl, cf, vf, compartmentIndex));
 			}
 		}
-		
-		// Creating high-lvel macro objects from the XML objects
-		List<AbstractMacro> model = parseMacros(listOfPKMacroList,cf,vf);
 		
 		final StructuralModel translated_sm = new StructuralModel();
 		if(parameters.get(KEEP_BLOCK_ID)){
@@ -356,8 +357,41 @@ public class Translator {
 			}
 		}
 		
+		// Piece of code added to make NONMEM happy about the order of the variables.
+		// Some optimisation needs to be done here, as repeated loops are performed.
+		// --- Start of ugly piece of code
+		Set<Integer> bookedIndexes = new HashSet<Integer>();
+		// Registering the already existing indexes. Typically the ones that are defined by PKmacro parameters (cmt)
+		for(CommonVariableDefinition var : variables){
+			if(var instanceof DerivativeVariable){
+				if(((DerivativeVariable) var).getOrder() != null){
+					bookedIndexes.add(((DerivativeVariable) var).getOrder());
+				}
+			}
+		}
+		// Browsing the elements from the input structural model to preserve the order.
+		for(PharmMLElement el : sm.getListOfStructuralModelElements()){
+			if(el instanceof DerivativeVariable){
+				if(((DerivativeVariable) el).getOrder() == null){
+					((DerivativeVariable) el).setOrder(getAndIncrementLowestAvailableIndex(bookedIndexes));
+				}
+			}
+			if(el instanceof PKMacroList){
+				for(PKMacro xmlmacro : ((PKMacroList) el).getListOfMacro()){
+					AbstractMacro macro = getMacroByOrigin(model, xmlmacro);
+					if(!(macro instanceof Compartment || macro instanceof Peripheral)){ // no need to deal with Compartment and Peripheral as the index of their generated DVs is already set.
+						for(CommonVariableDefinition var : macro.getVariables()){
+							if(var instanceof DerivativeVariable){
+								((DerivativeVariable) var).setOrder(getAndIncrementLowestAvailableIndex(bookedIndexes));
+							}
+						}
+					}
+				}
+			}
+		}
+		// --- End of ugly piece of code.
 		
-		// Now adding them to the new StructuralModel
+		// Now adding the variables to the new StructuralModel
 		for(CommonVariableDefinition var : variables){
 			if(var instanceof DerivativeVariable){
 				translated_sm.getListOfStructuralModelElements().add((DerivativeVariable) var);
@@ -396,6 +430,24 @@ public class Translator {
 				return inputList;
 			}
 		};
+	}
+	
+	private static Integer getAndIncrementLowestAvailableIndex(Set<Integer> set){
+		Integer currentIndex = 1;
+		while(set.contains(currentIndex)){
+			currentIndex++;
+		}
+		set.add(currentIndex);
+		return currentIndex;
+	}
+	
+	private static AbstractMacro getMacroByOrigin(List<AbstractMacro> listOfMacros,PKMacro origin){
+		for(AbstractMacro macro : listOfMacros){
+			if(macro.getOrigin().equals(origin)){
+				return macro;
+			}
+		}
+		return null;
 	}
 	
 }

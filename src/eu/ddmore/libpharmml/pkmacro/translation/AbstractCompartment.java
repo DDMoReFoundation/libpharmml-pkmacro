@@ -87,7 +87,7 @@ abstract class AbstractCompartment extends AbstractMacro {
 				VariableDefinition var = vf.fetchVariable(symbId);
 				if(var != null){
 					LoggerWrapper.getLogger().info("Variable "+symbId+" transformed to DerivativeVariable.");
-					dv = vf.transformToDerivativeVariable(var);
+					dv = vf.transformToDerivativeVariable(var, origin);
 				} else {
 					LoggerWrapper.getLogger().info("New derivative variable \""+symbId+"\".");
 					dv = vf.generateDerivativeVariable(symbId, origin);

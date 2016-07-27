@@ -23,6 +23,7 @@ import eu.ddmore.libpharmml.dom.commontypes.IntValue;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.CompartmentMacro;
+import eu.ddmore.libpharmml.impl.LoggerWrapper;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 /**
@@ -51,6 +52,8 @@ class Compartment extends AbstractCompartment {
 		Integer cmt = resolver.getValue("cmt",IntValue.class).getValue().intValue();
 		SymbolRef s = resolver.getValue("amount", SymbolRef.class);
 		DerivativeVariable dv = resolveDerivativeVariable(vf, s, macro);
+		LoggerWrapper.getLogger().info(dv+" order set to "+cmt);
+		dv.setOrder(cmt); // Highest-priority order assignment
 		
 		// Optionals
 		Operand volume;

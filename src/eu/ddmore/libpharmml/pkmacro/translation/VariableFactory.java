@@ -389,8 +389,10 @@ public class VariableFactory {
 		return null;
 	}
 	
-	DerivativeVariable transformToDerivativeVariable(VariableDefinition v){
+	DerivativeVariable transformToDerivativeVariable(VariableDefinition v, PKMacro origin){
 		DerivativeVariable dv = new DerivativeVariable(v.getSymbId(), v.getSymbolType());
+		dv.setOriginMacro(origin);
+		dv.setOriginatedFromMacro(true);
 		variables.remove(v);
 		variables.add(dv);
 		return dv;

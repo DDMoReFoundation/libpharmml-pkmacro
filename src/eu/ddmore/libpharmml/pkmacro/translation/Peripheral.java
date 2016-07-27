@@ -26,6 +26,7 @@ import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.MacroValue;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PeripheralMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.TransferRate;
+import eu.ddmore.libpharmml.impl.LoggerWrapper;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 
 /**
@@ -110,6 +111,8 @@ class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 		} else {
 			amount = vf.createDerivativeVariable(VariableFactory.PERIPH_CMT_PREFIX, periphCmt, macro);
 		}
+		LoggerWrapper.getLogger().info(amount+" order set to "+periphCmt);
+		amount.setOrder(periphCmt);
 		
 		AbstractCompartment central = cf.getCompartment(centralCmt);
 		Peripheral periph = new Peripheral(periphCmt, amount, null, null, inRate, outRate, central);

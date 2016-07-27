@@ -23,6 +23,7 @@ import java.util.List;
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 
 /**
  * Root class of any translated macro.
@@ -32,6 +33,8 @@ import eu.ddmore.libpharmml.dom.commontypes.VariableDefinition;
 public abstract class AbstractMacro {
 	
 	private int index = -1;
+	
+	private PKMacro origin = null;
 	
 	/**
 	 * Position of the macro as it is read in the input PharmML model.
@@ -47,6 +50,14 @@ public abstract class AbstractMacro {
 	 */
 	void setIndex(int index){
 		this.index = index;
+	}
+	
+	public PKMacro getOrigin(){
+		return origin;
+	}
+	
+	public void setOrigin(PKMacro macro){
+		this.origin = macro;
 	}
 	
 	/**

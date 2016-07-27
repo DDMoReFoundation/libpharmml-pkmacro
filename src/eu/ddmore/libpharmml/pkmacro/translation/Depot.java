@@ -20,6 +20,7 @@ package eu.ddmore.libpharmml.pkmacro.translation;
 
 import static eu.ddmore.libpharmml.impl.LoggerWrapper.getLogger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
@@ -31,7 +32,6 @@ import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.DepotMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
-import eu.ddmore.libpharmml.util.ChainedList;
 
 /**
  * <p>Macro class for the translation of {@link DepotMacro} objects.
@@ -143,7 +143,14 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 
 	@Override
 	List<CommonVariableDefinition> getVariables() {
-		return new ChainedList<CommonVariableDefinition>().addIfNotNull(target);
+		List<CommonVariableDefinition> variables = new ArrayList<CommonVariableDefinition>();
+		if(target != null){
+			variables.add(target);
+		}
+		if(absorption != null){
+			variables.addAll(absorption.getVariables());
+		}
+		return variables;
 	}
 
 	@Override
