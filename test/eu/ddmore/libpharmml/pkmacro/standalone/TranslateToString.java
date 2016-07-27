@@ -24,8 +24,8 @@ import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacroList;
 import eu.ddmore.libpharmml.impl.IdFactoryImpl;
 import eu.ddmore.libpharmml.impl.MarshalListener;
+import eu.ddmore.libpharmml.impl.NamespaceFilter;
 import eu.ddmore.libpharmml.impl.PharmMLVersion;
-import eu.ddmore.libpharmml.impl.XMLFilter;
 import eu.ddmore.libpharmml.pkmacro.translation.Input;
 import eu.ddmore.libpharmml.pkmacro.translation.MacroOutput;
 import eu.ddmore.libpharmml.pkmacro.translation.Translator;
@@ -66,7 +66,7 @@ public class TranslateToString {
 		MarshalListener listener = new MarshalListener(PharmMLVersion.DEFAULT, new IdFactoryImpl());
 		listener.autosetId(false);
 		m.setListener(listener);
-		JAXBElement<StructuralModel> jaxbEl = new JAXBElement<StructuralModel>(new QName(XMLFilter.NS_DEFAULT_MDEF, "StructuralModel"), StructuralModel.class, tl_sm);
+		JAXBElement<StructuralModel> jaxbEl = new JAXBElement<StructuralModel>(new QName(NamespaceFilter.NS_DEFAULT_MDEF, "StructuralModel"), StructuralModel.class, tl_sm);
 		m.marshal(jaxbEl, System.out);
 					
 	}
