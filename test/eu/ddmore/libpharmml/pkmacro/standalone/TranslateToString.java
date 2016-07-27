@@ -2,6 +2,7 @@ package eu.ddmore.libpharmml.pkmacro.standalone;
 
 import java.io.FileInputStream;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.tree.TreeNode;
@@ -11,6 +12,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import eu.ddmore.libpharmml.IPharmMLResource;
+import eu.ddmore.libpharmml.IValidationError;
 import eu.ddmore.libpharmml.PharmMlFactory;
 import eu.ddmore.libpharmml.dom.IndependentVariable;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
@@ -37,6 +39,13 @@ public class TranslateToString {
 				
 		FileInputStream in = new FileInputStream(args[0]);
 		IPharmMLResource resource = PharmMlFactory.getInstance().createLibPharmML().createDomFromResource(in);
+		if(!resource.getCreationReport().isValid()){
+			System.err.println("Warning. The model is invalid:");
+			Iterator<IValidationError> it = resource.getCreationReport().errorIterator();
+			while(it.hasNext()){
+				System.err.println(it.next());
+			}
+		}
 		
 		StructuralModel sm;
 		
