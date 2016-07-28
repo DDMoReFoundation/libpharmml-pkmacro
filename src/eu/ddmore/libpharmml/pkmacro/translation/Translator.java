@@ -381,6 +381,7 @@ public class Translator {
 		for(CommonVariableDefinition var : variables){
 			if(var instanceof DerivativeVariable){
 				if(((DerivativeVariable) var).getOrder() != null){
+					System.err.println(((DerivativeVariable) var).getOrder());
 					bookedIndexes.add(((DerivativeVariable) var).getOrder());
 				}
 			}
@@ -395,10 +396,10 @@ public class Translator {
 			if(el instanceof PKMacroList){
 				for(PKMacro xmlmacro : ((PKMacroList) el).getListOfMacro()){
 					AbstractMacro macro = getMacroByOrigin(model, xmlmacro);
-					if(!(macro instanceof Compartment || macro instanceof Peripheral)){ // no need to deal with Compartment and Peripheral as the index of their generated DVs is already set.
-						for(CommonVariableDefinition var : macro.getVariables()){
-							if(var instanceof DerivativeVariable){
-								((DerivativeVariable) var).setOrder(getAndIncrementLowestAvailableIndex(bookedIndexes));
+					for(CommonVariableDefinition var : macro.getVariables()){
+						if(var instanceof DerivativeVariable){
+							if(((DerivativeVariable) var).getOrder() == null){
+									((DerivativeVariable) var).setOrder(getAndIncrementLowestAvailableIndex(bookedIndexes));
 							}
 						}
 					}
