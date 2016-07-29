@@ -43,6 +43,13 @@ abstract class AbstractCompartment extends AbstractMacro {
 	protected final Operand volume;
 	protected final Operand concentration;
 	
+	/**
+	 * Minimal constructor.
+	 * @param cmt The identifier of this compartment, defined by cmt=i in the input macro. Must be unique.
+	 * @param amount The {@link DerivativeVariable} corresponding to the amount of this compartment (Ac).
+	 * @param volume Volume, can be null.
+	 * @param concentration Concentration, can be null.
+	 */
 	AbstractCompartment(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
 		this.cmt = cmt;
 		this.amount = amount;

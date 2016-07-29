@@ -49,6 +49,16 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  */
 class Peripheral extends AbstractCompartment implements CompartmentTargeter {
 	
+	/**
+	 * Minimal constructor.
+	 * @param cmt The identifier of the peripheral compartment.
+	 * @param amount Amount variable of the peripheral compartment (Ap).
+	 * @param volume Volume of the peripheral compartment, can be null.
+	 * @param concentration Concentration of the peripheral compartment, can be null.
+	 * @param inRate Transfer rate from central to peripheral.
+	 * @param outRate Transfer rate from peripheral to central.
+	 * @param target The target central compartment.
+	 */
 	private Peripheral(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration, Operand inRate, Operand outRate, AbstractCompartment target) {
 		super(cmt, amount, volume, concentration);
 		this.inRate = inRate;

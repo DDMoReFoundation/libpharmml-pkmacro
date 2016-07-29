@@ -33,6 +33,13 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  */
 class Compartment extends AbstractCompartment {
 	
+	/**
+	 * Minimal constructor.
+	 * @param cmt The identifier of this compartment, defined by cmt=i in the input macro. Must be unique.
+	 * @param amount The {@link DerivativeVariable} corresponding to the amount of this compartment (Ac).
+	 * @param volume Volume, can be null.
+	 * @param concentration Concentration, can be null.
+	 */
 	Compartment(Integer cmt, DerivativeVariable amount, Operand volume, Operand concentration) {
 		super(cmt, amount, volume, concentration);
 	}
