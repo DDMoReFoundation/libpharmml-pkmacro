@@ -110,7 +110,7 @@ public class Utils {
 		StringBuilder sb = new StringBuilder();
 		String symbolId;
 		if(v instanceof DerivativeVariable){
-			symbolId = "d"+v.getSymbId()+"/dt";
+			symbolId = "["+((DerivativeVariable) v).getOrder()+"] d"+v.getSymbId()+"/dt";
 		} else {
 			symbolId = v.getSymbId();
 		}
