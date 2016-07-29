@@ -29,6 +29,7 @@ import eu.ddmore.libpharmml.dom.maths.Binop;
 import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.EffectMacro;
+import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.PKMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
 import eu.ddmore.libpharmml.util.ChainedList;
 
@@ -47,20 +48,40 @@ import eu.ddmore.libpharmml.util.ChainedList;
  * 
  * <p>The target compartment "i" must have a predefined concentration, or a {@link InvalidMacroException} will be thrown.
  * 
+ * <p>Despite this class extending {@link AbstractCompartment}, no amount is defined for this new compartment. The derivation
+ * is made on the concentration of this compartment (Ce). Its amount is null.
+ * 
  * @author Florent Yvon
  */
 class Effect extends AbstractCompartment {
 	
+	/**
+	 * Parameter of the input macro.
+	 */
 	final protected Operand ke0;
+	/**
+	 * Target of the effect, defined by cmt=i in the input macro.
+	 */
 	final protected AbstractCompartment target;
-	
-//	protected VariableDefinition targetConcentration;
-	
-	private Effect(Integer cmt, AbstractCompartment target, Operand ke0, DerivativeVariable concentration, 
+	/**
+	 * The derivative variable to be created (dCe).
+	 */
+	final protected DerivativeVariable d_concentration;
+		
+	/**
+	 * Minimal constructor. Called via static {@link #fromMacro(CompartmentFactory, VariableFactory, EffectMacro)}.
+	 * @param cmt Identifier if this new compartment. Must be unique. It's <b>not</b> the target id as described in the doc of this class.
+	 * @param target The target compartment for the effect. Corresponding to the "cmt=i" defined in the {@link PKMacro} object.
+	 * @param ke0 Parameter to be added to new ODE dCe.
+	 * @param d_concentration The variable of the new ODE, dCe.
+	 * @param targetConcentration The concentration of the targetted compartment.
+	 */
+	private Effect(Integer cmt, AbstractCompartment target, Operand ke0, DerivativeVariable d_concentration, 
 			VariableDefinition targetConcentration){
-		super(cmt, null, null, new SymbolRef(concentration.getSymbId()));
+		super(cmt, null, null, new SymbolRef(d_concentration.getSymbId()));
 		this.ke0 = ke0;
 		this.target = target;
+		this.d_concentration = d_concentration;
 		
 		// C = Ac/V
 		targetConcentration.assign(new Binop(Binoperator.DIVIDE, 
@@ -68,9 +89,9 @@ class Effect extends AbstractCompartment {
 				target.getVolume()));
 		
 		// dCe/dt = ke0*(C - Ce)
-		concentration.assign(new Binop(Binoperator.TIMES,
+		d_concentration.assign(new Binop(Binoperator.TIMES,
 				ke0,
-				new Binop(Binoperator.MINUS, new SymbolRef(targetConcentration.getSymbId()), new SymbolRef(concentration.getSymbId()))
+				new Binop(Binoperator.MINUS, new SymbolRef(targetConcentration.getSymbId()), new SymbolRef(d_concentration.getSymbId()))
 				));
 	}
 	
@@ -111,13 +132,20 @@ class Effect extends AbstractCompartment {
 		return ke0;
 	}
 
-	public Operand getConcentration() {
-		return concentration;
+	/**
+	 * Gets dCe/dt.
+	 * @return dCe/dt.
+	 */
+	public DerivativeVariable getDConcentration() {
+		return d_concentration;
 	}
 
 	@Override
 	List<CommonVariableDefinition> getVariables() {
-		return new ChainedList<CommonVariableDefinition>().addIfNotNull(amount);
+		ChainedList<CommonVariableDefinition> variables = new ChainedList<CommonVariableDefinition>();
+		variables.addIfNotNull(amount);
+		variables.addIfNotNull(d_concentration);
+		return variables;
 	}
 	
 //	@Override
