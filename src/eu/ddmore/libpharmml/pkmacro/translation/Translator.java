@@ -381,7 +381,6 @@ public class Translator {
 		for(CommonVariableDefinition var : variables){
 			if(var instanceof DerivativeVariable){
 				if(((DerivativeVariable) var).getOrder() != null){
-					System.err.println(((DerivativeVariable) var).getOrder());
 					bookedIndexes.add(((DerivativeVariable) var).getOrder());
 				}
 			}
