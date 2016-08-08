@@ -278,7 +278,6 @@ public class Translator {
 	 * macros are copied in the output model.
 	 * @param sm The structural model that contains PK macros to be translated.
 	 * @param version The wanted PharmML version of the output.
-	 * @param t The {@link IndependentVariable} of the model corresponding to time.
 	 * @return A {@link MacroOutput} implementation.
 	 * @throws InvalidMacroException If the translation is not possible because of any invalid
 	 * macro within the model.
