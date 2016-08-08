@@ -102,7 +102,7 @@ import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
  * </ul>
  * 
  * @author Florent Yvon
- * @version 0.3.1
+ * @version 0.3.2
  */
 public class Translator {
 		
