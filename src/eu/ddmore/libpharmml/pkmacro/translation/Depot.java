@@ -27,8 +27,6 @@ import eu.ddmore.libpharmml.dom.commontypes.CommonVariableDefinition;
 import eu.ddmore.libpharmml.dom.commontypes.DerivativeVariable;
 import eu.ddmore.libpharmml.dom.commontypes.Scalar;
 import eu.ddmore.libpharmml.dom.commontypes.SymbolRef;
-import eu.ddmore.libpharmml.dom.maths.Binop;
-import eu.ddmore.libpharmml.dom.maths.Binoperator;
 import eu.ddmore.libpharmml.dom.maths.Operand;
 import eu.ddmore.libpharmml.dom.modeldefn.pkmacro.DepotMacro;
 import eu.ddmore.libpharmml.pkmacro.exceptions.InvalidMacroException;
@@ -155,10 +153,9 @@ class Depot extends AbstractMacro implements InputSource, CompartmentTargeter {
 
 	@Override
 	public void modifyTargetODE() {
-		// Same as Absorption with FIRST_ORDER (but we are working directly with the variable and not the compartment here)
-		if(ka != null){
-			Binop binop = new Binop(Binoperator.TIMES, ka, new SymbolRef(target.getSymbId()));
-			Utils.addOperand(target,Binoperator.PLUS, binop);
+		// Executed if the argument "ka" is used
+		if(absorption != null){
+			absorption.modifyTargetODE();
 		}
 	}
 	
